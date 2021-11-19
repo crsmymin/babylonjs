@@ -12,337 +12,414 @@ var createDefaultEngine = function () {
 };
 
 var createScene = function () {
-
-  engine.enableOfflineSupport = false;
-
+  BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(function (loader) {
+    if (loader.name === "gltf") {
+      loader.useRangeRequests = true;
+    }
+  });
   // Scene and Camera
   var scene = new BABYLON.Scene(engine);
-  //Rendering loop (executed for everyframe)
-  // scene.onBeforeRenderObservable.add(() => {
-  //   console.log("1");
-  // })
 
   var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 10, new BABYLON.Vector3(0, 0, 0), scene);
   scene.activeCamera = camera;
   scene.activeCamera.attachControl(canvas, true);
 
-  camera.setPosition(new BABYLON.Vector3(0, 560, 0));
+  camera.setPosition(new BABYLON.Vector3(0, 300, 150));
   camera.lowerBetaLimit = 0.3;
-  camera.upperBetaLimit = (Math.PI / 2) * 0.9;
-  // camera.lowerRadiusLimit = 15;
-  // camera.upperRadiusLimit = 100;
+  camera.upperBetaLimit = (Math.PI / 2) * 1;
+  //   camera.lowerRadiusLimit = 15;
+  //   camera.upperRadiusLimit = 100;
   camera.attachControl(canvas, true);
 
   // Lights
   var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-  light.intensity = 0.7;
+  light.intensity = 1;
   light.specular = BABYLON.Color3.Black();
 
   //Using a procedural texture to create the sky
-  var boxCloud = BABYLON.Mesh.CreateSphere("boxCloud", 1030, 1030, scene);
+  var boxCloud = BABYLON.Mesh.CreateSphere("boxCloud", 100, 1000, scene);
   boxCloud.position = new BABYLON.Vector3(1, 1, 1);
   var cloudMaterial = new BABYLON.StandardMaterial("cloudMat", scene);
-  var cloudProcText = new BABYLON.CloudProceduralTexture("cloud", 1024, scene);
+  var cloudProcText = new BABYLON.CloudProceduralTexture("cloud", 512, scene);
   cloudMaterial.emissiveTexture = cloudProcText;
   cloudMaterial.backFaceCulling = false;
   cloudMaterial.emissiveTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
   boxCloud.material = cloudMaterial;
 
   // Ground
-  // var ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 250, width: 250, subdivisions: 4 }, scene);
-  // var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-  // groundMaterial.diffuseTexture = new BABYLON.Texture("textures/grass.png", scene);
-  // groundMaterial.diffuseTexture.uScale = 25;
-  // groundMaterial.diffuseTexture.vScale = 25;
-  // groundMaterial.specularColor = new BABYLON.Color3(.1, .1, .1);
-  // ground.material = groundMaterial;
+  //   var ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 250, width: 250, subdivisions: 1 }, scene);
+  //   var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
+  //   groundMaterial.diffuseTexture = new BABYLON.Texture("textures/grass.png", scene);
+  //   groundMaterial.diffuseTexture.uScale = 75;
+  //   groundMaterial.diffuseTexture.vScale = 75;
+  //   groundMaterial.specularColor = new BABYLON.Color3(.1, .1, .1);
+  //   ground.material = groundMaterial;
 
-  // load thema park
-  BABYLON.SceneLoader.ImportMesh("", "./", "ground.gltf", scene, function (newMeshes) {
-    var land = newMeshes[0];
-    land.scaling = new BABYLON.Vector3(120, 120, 120);
-    land.position.y = -10;
-    land.position.x = 0; 
-    land.position.z = 0;
 
+  // attact model name   
+  function attachLabel(modelName, modelText) {
     // GUI
     var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    // let rect1 = new BABYLON.GUI.Rectangle();
-    //     rect1.parent = land;
-    //     rect1.width = "150px";
-    //     rect1.height ="35px";
-    //     rect1.thickness = 0;  
-    //     rect1.background = "black";
-    //     rect1.alpha = 0.6;
-    //     rect1.cornerRadius = 25;  
-    //     advancedTexture.addControl(rect1);
-    //     rect1.linkWithMesh(land);
-    //     rect1.linkOffsetY = -180;
-        
-    //     var label = new BABYLON.GUI.TextBlock();
-    //     label.text = "놀이공원";
-    //     label.color = "white";
-    //     rect1.addControl(label);
-    //     rect1.linkOffsetY = 150;
-    //     land.label = rect1;
+    let rect1 = new BABYLON.GUI.Rectangle();
+    rect1.parent = airport;
+    rect1.width = "150px";
+    rect1.height = "35px";
+    rect1.thickness = 2;
+    rect1.background = "black";
+    rect1.alpha = 0.6;
+    rect1.cornerRadius = 25;
+    advancedTexture.addControl(rect1);
+    rect1.linkWithMesh(modelName);
+    rect1.linkOffsetY = -180;
 
-    // scene.onBeforeRenderObservable.add(() => {
-    //   const d = BABYLON.Vector3.Distance(camera.position, land.position);
+    var label = new BABYLON.GUI.TextBlock();
+    label.text = modelText;
+    label.color = "white";
+    rect1.addControl(label);
+    rect1.linkOffsetY = -80;
+    rect1.linkOffsetX = -50;
+    airport.label = rect1;
+  }
 
-    //   rect1.width = 0.8 * 11 / d;
-    //   rect1.height = 0.25 * 11 / d;
-    //   label.fontSize = 100 * 11 / d; 
-    // });
-    
-    land.actionManager = new BABYLON.ActionManager(scene);
-    land.actionManager.isRecursive = true;
+  var deg = Math.PI / 2;
 
-    land.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnPickUpTrigger },function() {
-        console.log("clicked thema park")
-      }
-    ));
-    land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function(ev){
-        // write somthing ... 
-        document.body.style.cursor='pointer'
-        // scene.beginAnimation(rect1, 0, 10, false);
-      }
-    ));
-    land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function(ev){
-        // write somthing ...
-        document.body.style.cursor=''
-        // scene.beginAnimation(rect1, 10, 0, false);
-      }
-    ));
+  // load ground
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ground.gltf", scene, function (newMeshes) {
+    var ground = newMeshes[0];
+    ground.scaling = new BABYLON.Vector3(12, 10, 12)
+    ground.position = new BABYLON.Vector3(0, -13, 0);
+
+  });
+
+  // load airport
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "airport.gltf", scene, function (newMeshes) {
+    var airport = newMeshes[0];
+    airport.scaling.scaleInPlace(1)
+    airport.position = new BABYLON.Vector3(-80, 1, -90);
+
+
+    attachLabel(airport, "Airport")
+
+    airport.actionManager = new BABYLON.ActionManager(scene);
+    airport.actionManager.isRecursive = true;
+
+    airport.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    airport.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    airport.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+  // load commerce
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "commerce.gltf", scene, function (newMeshes) {
+    var commerce = newMeshes[0];
+    commerce.scaling.scaleInPlace(0.01)
+    commerce.position = new BABYLON.Vector3(110, 33, 0);
+    commerce.rotation = new BABYLON.Vector3(0, deg * 1, 0);
+
+
+    attachLabel(commerce, "Commerce")
+
+    commerce.actionManager = new BABYLON.ActionManager(scene);
+    commerce.actionManager.isRecursive = true;
+
+    commerce.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    commerce.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    commerce.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+  // load convinience
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "convinience.gltf", scene, function (newMeshes) {
+    var convinience = newMeshes[0];
+    convinience.scaling.scaleInPlace(15)
+    convinience.position = new BABYLON.Vector3(60, 1, -90);
+    convinience.rotation = new BABYLON.Vector3(0, deg * 2, 0);
+
+
+    attachLabel(convinience, "Convinience")
+
+    convinience.actionManager = new BABYLON.ActionManager(scene);
+    convinience.actionManager.isRecursive = true;
+
+    convinience.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    convinience.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    convinience.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+  // load office
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "office.gltf", scene, function (newMeshes) {
+    var office = newMeshes[0];
+    office.scaling.scaleInPlace(10)
+    office.position = new BABYLON.Vector3(5, 1, -90);
+    office.rotation = new BABYLON.Vector3(0, deg * 3, 0);
+
+
+    attachLabel(office, "Office")
+
+    office.actionManager = new BABYLON.ActionManager(scene);
+    office.actionManager.isRecursive = true;
+
+    office.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    office.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    office.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+  // load house
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "house.gltf", scene, function (newMeshes) {
+    var house = newMeshes[0];
+    house.scaling.scaleInPlace(7)
+    house.position = new BABYLON.Vector3(-100, 1, 95);
+    house.rotation = new BABYLON.Vector3(0, deg * 3, 0);
+
+
+    attachLabel(house, "House")
+
+    house.actionManager = new BABYLON.ActionManager(scene);
+    house.actionManager.isRecursive = true;
+
+    house.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    house.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    house.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+
+  // load nature park
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "nature.gltf", scene, function (newMeshes) {
+    var naturePark = newMeshes[0];
+    naturePark.scaling.scaleInPlace(11)
+    naturePark.position = new BABYLON.Vector3(8, 1, 15);
+
+    attachLabel(naturePark, "Nature park")
+
+    naturePark.actionManager = new BABYLON.ActionManager(scene);
+    naturePark.actionManager.isRecursive = true;
+
+    naturePark.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    naturePark.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    naturePark.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+  // load barco building
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "barco.gltf", scene, function (newMeshes) {
+    var barco = newMeshes[0];
+    barco.scaling.scaleInPlace(6)
+    barco.position = new BABYLON.Vector3(-90, 1, 40);
+    barco.rotation = new BABYLON.Vector3(0, deg * 3, 0)
+
+    attachLabel(barco, "Barco building")
+
+    barco.actionManager = new BABYLON.ActionManager(scene);
+    barco.actionManager.isRecursive = true;
+
+    barco.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    barco.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    barco.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+  // load cafe
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "cafe.gltf", scene, function (newMeshes) {
+    var cafe = newMeshes[0];
+    cafe.scaling.scaleInPlace(17)
+    cafe.position = new BABYLON.Vector3(60, 1, 105);
+    cafe.rotation = new BABYLON.Vector3(0, deg * 1, 0)
+
+    attachLabel(cafe, "Cafe")
+
+    cafe.actionManager = new BABYLON.ActionManager(scene);
+    cafe.actionManager.isRecursive = true;
+
+    cafe.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    cafe.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    cafe.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
+
+  });
+
+  // load cafe
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "building.gltf", scene, function (newMeshes) {
+    var building = newMeshes[0];
+    building.scaling.scaleInPlace(2)
+    building.position = new BABYLON.Vector3(-25, 1, 110);
+    building.rotation = new BABYLON.Vector3(0, deg * 1, 0)
+
+    attachLabel(building, "Building")
+
+    building.actionManager = new BABYLON.ActionManager(scene);
+    building.actionManager.isRecursive = true;
+
+    building.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
+      trigger: BABYLON.ActionManager.OnPickUpTrigger
+    }, function () {
+      console.log("clicked thema park");
+      // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
+    }));
+    building.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      // write somthing ... 
+      document.body.style.cursor = 'pointer'
+      // scene.beginAnimation(rect1, 0, 10, false);
+    }));
+    building.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      // write somthing ...
+      document.body.style.cursor = ''
+      // scene.beginAnimation(rect1, 10, 0, false);
+    }));
 
   });
 
   // load airplane
-  BABYLON.SceneLoader.ImportMesh("", "./", "scene_ap.gltf", scene, function (newMeshes) {
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "airplane.gltf", scene, function (newMeshes) {
     var airPlane = newMeshes[0];
-    airPlane.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-    airPlane.position.y = 20;
-    airPlane.position.x += 10; 
-    airPlane.position.z = 0;
+    airPlane.scaling.scaleInPlace(0.25);
+    airPlane.position = new BABYLON.Vector3(-80, 10, -70);
+    airPlane.rotation = new BABYLON.Vector3(deg * 0.25, deg * 3, 0)
+
+  });
+
+  // load ufo
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ufo.gltf", scene, function (newMeshes) {
+    var ufo = newMeshes[0];
+    ufo.scaling.scaleInPlace(0.01);
 
     scene.actionManager = new BABYLON.ActionManager(scene);
-    
+
     // Animations
     var alpha = 0;
+    var alpha2 = 0;
     scene.registerBeforeRender(function () {
-      airPlane.position.x = 170 * Math.cos(alpha);
-      airPlane.position.y = 25;
-      airPlane.position.z = 170 * Math.sin(alpha);
-      alpha += 0.005;
-      
+      ufo.position.x = 50 * Math.cos(alpha);
+      ufo.position.y = 45;
+      ufo.position.z = 50 * Math.sin(alpha);
+      ufo.rotation = new BABYLON.Vector3(0, alpha2, 0);
+
+      alpha += 0.01;
+      alpha2 += 0.02;
+
     });
   });
 
-  
 
-  // // load thema part gltf
-  // BABYLON.SceneLoader.ImportMesh("", "./", "scene1.gltf", scene, function (newMeshes) {
-  //   var land = newMeshes[0];
-  //   // camera.target = land;
-    
-  //   land.actionManager = new BABYLON.ActionManager(scene);
-  //   land.actionManager.isRecursive = true;
+  // load car
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "car.gltf", scene, function (newMeshes) {
+    var car = newMeshes[0];
+    car.scaling.scaleInPlace(3);
+    car.position = new BABYLON.Vector3(20, 1, -60);
 
-  //   let rect1 = new BABYLON.GUI.Rectangle();
-  //     advancedTexture.addControl(rect1);
-  //     rect1.width = "200px";
-  //     rect1.height ="40px";
-  //     rect1.thickness = 2;        
-  //     rect1.linkOffsetX = "250px";
-  //     rect1.linkOffsetY = "-100px";
-  //     rect1.transformCenterX = 0;
-  //     rect1.transformCenterY = 1;  
-  //     rect1.background = "grey";
-  //     rect1.alpha = 0.7;
-  //     rect1.scaleX = 0;
-  //     rect1.scaleY = 0;
-  //     rect1.cornerRadius = 20
-  //     rect1.linkWithMesh(land);     
+    scene.actionManager = new BABYLON.ActionManager(scene);
 
-  //   let text1 = new BABYLON.GUI.TextBlock();
-  //     text1.text = "just night town";
-  //     text1.color = "White";
-  //     text1.fontSize = 14;
-  //     text1.textWrapping = true;
-  //     text1.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  //     text1.background = '#006994'
-  //     rect1.addControl(text1)
-  //     text1.alpha = (1/text1.parent.alpha);
-  //     text1.paddingTop = "10px";
-  //     text1.paddingBottom = "10px";
-  //     text1.paddingLeft = "10px";
-  //     text1.paddingRight = "10px";
-
-  //   let scaleXAnimation = new BABYLON.Animation("myAnimation", "scaleX", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-  //   let scaleYAnimation = new BABYLON.Animation("myAnimation", "scaleY", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-
-  //   var keys = [];
-
-  //   keys.push({
-  //     frame: 0,
-  //     value: 0
-  //   });
-  //   keys.push({
-  //     frame: 10,
-  //     value: 1
-  //   });
-
-  //   scaleXAnimation.setKeys(keys);
-  //   scaleYAnimation.setKeys(keys);
-  //   rect1.animations = [];
-  //   rect1.animations.push(scaleXAnimation);
-  //   rect1.animations.push(scaleYAnimation);    
-
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnPickUpTrigger },function() {
-  //       alert('clicked night town!');
-  //     }
-  //   ));
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function(ev){
-  //       // write somthing ...
-  //       document.body.style.cursor='pointer'
-  //       scene.beginAnimation(rect1, 0, 10, false);
-  //     }
-  //   ));
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function(ev){
-  //       // write somthing ...
-  //       document.body.style.cursor=''
-  //       scene.beginAnimation(rect1, 10, 0, false);
-  //     }
-  //   ));
-
-  //   land.actionManager.hoverCursor = "pointer";
-  
-  //   land.scaling.scaleInPlace(1);
-  //   land.position.y = -0.2;
-  //   land.position.x = 30; 
-  //   land.position.z = 0; 
-  //   land.isPickable = true;
-  // });
-
-  // // load town gltf
-  // BABYLON.SceneLoader.ImportMesh("", "./", "scene2.gltf", scene, function (newMeshes) {
-  //   var land = newMeshes[0];
-  //   // camera.target = land;
-    
-  //   land.actionManager = new BABYLON.ActionManager(scene);
-  //   land.actionManager.isRecursive = true;
-
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnPickUpTrigger },function() {
-  //       alert('clicked town!');
-  //     }
-  //   ));
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function(ev){
-  //       console.log("hover");
-  //       // write somthing ...
-  //       document.body.style.cursor='pointer'
-  //       if (!land.hover) {
-  //         land.hover = true;
-  //         const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameterX: 1, diameterY: 0.1, diameterZ: 1});
-
-  //         var mat = new BABYLON.StandardMaterial("mat1", scene);
-  //         mat.alpha = 0;
-  //         mat.diffuseColor = new BABYLON.Color4(1, 1, 1, 0.1);
-
-  //         var hl = new BABYLON.HighlightLayer("hl1", scene);
-  //         hl.addMesh(sphere, BABYLON.Color3.Green());
-
-  //         sphere.parent = land;
-  //         sphere.material = mat;
-  //         land.highlight = sphere;
-
-  //         sphere.scaling.x = 1.5;
-  //         sphere.scaling.z = 1.5;
-
-  //       }
-  //     }
-  //   ));
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function(ev){
-  //       // write somthing ...
-  //       console.log("hover out");
-  //       document.body.style.cursor=''
-  //     }
-  //   ));
-
-  //   land.actionManager.hoverCursor = "pointer";
-  
-  //   land.scaling.scaleInPlace(0.5);
-  //   land.position.y = 0.5;
-  //   land.position.x = 0; 
-  //   land.position.z = 0; 
-  //   // land.isPickable = true;
-  // });
-
-  // // load thema part gltf
-  // BABYLON.SceneLoader.ImportMesh("", "./", "scene3.gltf", scene, function (newMeshes) {
-  //   var land = newMeshes[0];
-  //   // camera.target = land;
-    
-  //   land.actionManager = new BABYLON.ActionManager(scene);
-  //   land.actionManager.isRecursive = true;
-
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnPickUpTrigger },function() {
-  //       alert('clicked thema park!');
-  //     }
-  //   ));
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function(ev){
-  //       // write somthing ...
-  //       document.body.style.cursor='pointer'
-  //     }
-  //   ));
-  //   land.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function(ev){
-  //       // write somthing ...
-  //       document.body.style.cursor=''
-  //     }
-  //   ));
-
-  //   land.actionManager.hoverCursor = "pointer";
-  
-  //   land.scaling.scaleInPlace(3);
-  //   land.position.y = -0.2;
-  //   land.position.x = 0; 
-  //   land.position.z = 30; 
-  //   land.isPickable = true;
-  // });
-
-
-  scene.registerBeforeRender(function () {
-    light.position = camera.position;
-    // camera.alpha += 0.0005 * scene.getAnimationRatio();
   });
-
-  // var planeOpts = {
-  //   height: 5.4762, 
-  //   width: 10.3967, 
-  //   sideOrientation: BABYLON.Mesh.DOUBLESIDE
-	// };
-	// var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
-	// var vidPos = (new BABYLON.Vector3(0,10,1))
-  //   ANote0Video.position = vidPos;
-	// var ANote0VideoMat = new BABYLON.StandardMaterial("m", scene);
-	// var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex","./textures/sample.mp4", scene);
-	// ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
-	// ANote0VideoMat.roughness = 1;
-	// ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
-	// ANote0Video.material = ANote0VideoMat;
-	// scene.onPointerObservable.add(function(evt){
-	// 		if(evt.pickInfo.pickedMesh === ANote0Video){
-  //               //console.log("picked");
-	// 				if(ANote0VideoVidTex.video.paused)
-	// 					ANote0VideoVidTex.video.play();
-	// 				else
-	// 					ANote0VideoVidTex.video.pause();
-  //                   console.log(ANote0VideoVidTex.video.paused?"paused":"playing");
-	// 		}
-	// }, BABYLON.PointerEventTypes.POINTERPICK);
-
 
   return scene;
 }
+
 window.initFunction = async function () {
 
 
