@@ -26,11 +26,11 @@ var createScene = function () {
   scene.activeCamera = camera;
   scene.activeCamera.attachControl(canvas, true);
 
-  camera.setPosition(new BABYLON.Vector3(50, 60, 0));
+  camera.setPosition(new BABYLON.Vector3(0, 560, 0));
   camera.lowerBetaLimit = 0.3;
   camera.upperBetaLimit = (Math.PI / 2) * 0.9;
-  camera.lowerRadiusLimit = 15;
-  camera.upperRadiusLimit = 100;
+  // camera.lowerRadiusLimit = 15;
+  // camera.upperRadiusLimit = 100;
   camera.attachControl(canvas, true);
 
   // Lights
@@ -39,7 +39,7 @@ var createScene = function () {
   light.specular = BABYLON.Color3.Black();
 
   //Using a procedural texture to create the sky
-  var boxCloud = BABYLON.Mesh.CreateSphere("boxCloud", 230, 230, scene);
+  var boxCloud = BABYLON.Mesh.CreateSphere("boxCloud", 1030, 1030, scene);
   boxCloud.position = new BABYLON.Vector3(1, 1, 1);
   var cloudMaterial = new BABYLON.StandardMaterial("cloudMat", scene);
   var cloudProcText = new BABYLON.CloudProceduralTexture("cloud", 1024, scene);
@@ -49,51 +49,51 @@ var createScene = function () {
   boxCloud.material = cloudMaterial;
 
   // Ground
-  var ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 250, width: 250, subdivisions: 4 }, scene);
-  var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-  groundMaterial.diffuseTexture = new BABYLON.Texture("textures/grass.png", scene);
-  groundMaterial.diffuseTexture.uScale = 25;
-  groundMaterial.diffuseTexture.vScale = 25;
-  groundMaterial.specularColor = new BABYLON.Color3(.1, .1, .1);
-  ground.material = groundMaterial;
+  // var ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 250, width: 250, subdivisions: 4 }, scene);
+  // var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
+  // groundMaterial.diffuseTexture = new BABYLON.Texture("textures/grass.png", scene);
+  // groundMaterial.diffuseTexture.uScale = 25;
+  // groundMaterial.diffuseTexture.vScale = 25;
+  // groundMaterial.specularColor = new BABYLON.Color3(.1, .1, .1);
+  // ground.material = groundMaterial;
 
   // load thema park
-  BABYLON.SceneLoader.ImportMesh("", "./", "scene.gltf", scene, function (newMeshes) {
+  BABYLON.SceneLoader.ImportMesh("", "./", "ground.gltf", scene, function (newMeshes) {
     var land = newMeshes[0];
-    land.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
-    land.position.y = -0.1;
-    land.position.x = -30; 
+    land.scaling = new BABYLON.Vector3(120, 120, 120);
+    land.position.y = -10;
+    land.position.x = 0; 
     land.position.z = 0;
 
     // GUI
     var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    let rect1 = new BABYLON.GUI.Rectangle();
-        rect1.parent = land;
-        rect1.width = "150px";
-        rect1.height ="35px";
-        rect1.thickness = 0;  
-        rect1.background = "black";
-        rect1.alpha = 0.6;
-        rect1.cornerRadius = 25;  
-        advancedTexture.addControl(rect1);
-        rect1.linkWithMesh(land);
-        rect1.linkOffsetY = -180;
+    // let rect1 = new BABYLON.GUI.Rectangle();
+    //     rect1.parent = land;
+    //     rect1.width = "150px";
+    //     rect1.height ="35px";
+    //     rect1.thickness = 0;  
+    //     rect1.background = "black";
+    //     rect1.alpha = 0.6;
+    //     rect1.cornerRadius = 25;  
+    //     advancedTexture.addControl(rect1);
+    //     rect1.linkWithMesh(land);
+    //     rect1.linkOffsetY = -180;
         
-        var label = new BABYLON.GUI.TextBlock();
-        label.text = "놀이공원";
-        label.color = "white";
-        rect1.addControl(label);
-        rect1.linkOffsetY = 150;
-        land.label = rect1;
+    //     var label = new BABYLON.GUI.TextBlock();
+    //     label.text = "놀이공원";
+    //     label.color = "white";
+    //     rect1.addControl(label);
+    //     rect1.linkOffsetY = 150;
+    //     land.label = rect1;
 
-    scene.onBeforeRenderObservable.add(() => {
-      const d = BABYLON.Vector3.Distance(camera.position, land.position);
+    // scene.onBeforeRenderObservable.add(() => {
+    //   const d = BABYLON.Vector3.Distance(camera.position, land.position);
 
-      rect1.width = 0.8 * 11 / d;
-      rect1.height = 0.25 * 11 / d;
-      label.fontSize = 100 * 11 / d; 
-    });
+    //   rect1.width = 0.8 * 11 / d;
+    //   rect1.height = 0.25 * 11 / d;
+    //   label.fontSize = 100 * 11 / d; 
+    // });
     
     land.actionManager = new BABYLON.ActionManager(scene);
     land.actionManager.isRecursive = true;
@@ -120,7 +120,7 @@ var createScene = function () {
   // load airplane
   BABYLON.SceneLoader.ImportMesh("", "./", "scene_ap.gltf", scene, function (newMeshes) {
     var airPlane = newMeshes[0];
-    airPlane.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+    airPlane.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
     airPlane.position.y = 20;
     airPlane.position.x += 10; 
     airPlane.position.z = 0;
@@ -130,9 +130,9 @@ var createScene = function () {
     // Animations
     var alpha = 0;
     scene.registerBeforeRender(function () {
-      airPlane.position.x = 70 * Math.cos(alpha);
+      airPlane.position.x = 170 * Math.cos(alpha);
       airPlane.position.y = 25;
-      airPlane.position.z = 70 * Math.sin(alpha);
+      airPlane.position.z = 170 * Math.sin(alpha);
       alpha += 0.005;
       
     });
