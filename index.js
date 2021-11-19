@@ -39,6 +39,7 @@ var createScene = function () {
   //Using a procedural texture to create the sky
   var boxCloud = BABYLON.Mesh.CreateSphere("boxCloud", 100, 1000, scene);
   boxCloud.position = new BABYLON.Vector3(1, 1, 1);
+  boxCloud.rotation = new BABYLON.Vector3(1, 0, 1);
   var cloudMaterial = new BABYLON.StandardMaterial("cloudMat", scene);
   var cloudProcText = new BABYLON.CloudProceduralTexture("cloud", 512, scene);
   cloudMaterial.emissiveTexture = cloudProcText;
@@ -87,6 +88,7 @@ var createScene = function () {
   // load ground
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ground.gltf", scene, function (newMeshes) {
     var ground = newMeshes[0];
+    ground.isPickable = true;
     ground.scaling = new BABYLON.Vector3(12, 10, 12)
     ground.position = new BABYLON.Vector3(0, -13, 0);
 
@@ -95,8 +97,9 @@ var createScene = function () {
   // load airport
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "airport.gltf", scene, function (newMeshes) {
     var airport = newMeshes[0];
-    airport.scaling.scaleInPlace(1)
-    airport.position = new BABYLON.Vector3(-80, 1, -90);
+    airport.scaling.scaleInPlace(1.5);
+    airport.position = new BABYLON.Vector3(-95, 1, -100);
+    airport.rotation = new BABYLON.Vector3(0, deg * 4, 0);
 
 
     attachLabel(airport, "Airport")
@@ -379,10 +382,39 @@ var createScene = function () {
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "airplane.gltf", scene, function (newMeshes) {
     var airPlane = newMeshes[0];
     airPlane.scaling.scaleInPlace(0.25);
-    airPlane.position = new BABYLON.Vector3(-80, 10, -70);
-    airPlane.rotation = new BABYLON.Vector3(deg * 0.25, deg * 3, 0)
+    airPlane.position = new BABYLON.Vector3(-80, 1, -130);
+    airPlane.rotation = new BABYLON.Vector3(0, deg * 1, 0)
 
   });
+
+  // load tree
+  var tree = BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "tree.gltf", scene, function (newMeshes) {
+    var tree = newMeshes[0];
+    tree.scaling.scaleInPlace(20);
+    var tree2 = tree.clone("tree2");
+    var tree3 = tree.clone("tree3");
+    var tree4 = tree.clone("tree4");
+    var tree5 = tree.clone("tree5");
+    var tree6 = tree.clone("tree6");
+    var tree7 = tree.clone("tree7");
+    var tree8 = tree.clone("tree8");
+    var tree9 = tree.clone("tree9");
+    var tree10 = tree.clone("tree10");
+    var tree11 = tree.clone("tree11");
+    tree.position = new BABYLON.Vector3(30, 0, 90);
+    tree2.position = new BABYLON.Vector3(10, 0, 90);
+    tree3.position = new BABYLON.Vector3(20, 0, 110);
+    tree4.position = new BABYLON.Vector3(20, 0, 140);
+    tree5.position = new BABYLON.Vector3(-10, 0, 140);
+    tree6.position = new BABYLON.Vector3(-40, 0, 150);
+    tree7.position = new BABYLON.Vector3(-70, 0, 100);
+    tree8.position = new BABYLON.Vector3(-70, 0, 130);
+    tree9.position = new BABYLON.Vector3(-130, 0, 10);
+    tree10.position = new BABYLON.Vector3(-110, 0, -30);
+    tree11.position = new BABYLON.Vector3(-118, 0, -7);
+  });
+
+
 
   // load ufo
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ufo.gltf", scene, function (newMeshes) {
@@ -406,6 +438,25 @@ var createScene = function () {
     });
   });
 
+  // load bird
+  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "bird.gltf", scene, function (newMeshes) {
+    var bird = newMeshes[0];
+    bird.scaling.scaleInPlace(0.1);
+
+    scene.actionManager = new BABYLON.ActionManager(scene);
+
+    // Animations
+    var alpha = 0;
+    scene.registerBeforeRender(function () {
+      bird.position.x = 50 * Math.cos(alpha);
+      bird.position.y = 45;
+      bird.position.z = 50 * Math.sin(alpha);
+
+      alpha += 0.01;
+
+    });
+  });
+
 
   // load car
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "car.gltf", scene, function (newMeshes) {
@@ -416,8 +467,6 @@ var createScene = function () {
     scene.actionManager = new BABYLON.ActionManager(scene);
 
   });
-
-  return scene;
 }
 
 window.initFunction = async function () {
