@@ -110,7 +110,7 @@ var createScene = function () {
     airport.actionManager.registerAction(new BABYLON.ExecuteCodeAction({
       trigger: BABYLON.ActionManager.OnPickUpTrigger
     }, function () {
-      console.log("clicked thema park");
+      camera.spinTo("beta", 1.2, 20);
       // window.open('https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%8B%A4%EB%82%A0', '_blank');
     }));
     airport.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
