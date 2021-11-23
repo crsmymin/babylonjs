@@ -103,7 +103,7 @@ var createScene = function () {
   // load ground
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ground.gltf", scene, function (newMeshes) {
     var ground = newMeshes[0];
-    ground.scaling = new BABYLON.Vector3(12, 10, 12)
+    ground.scaling = new BABYLON.Vector3(16, 10, 16)
     ground.position = new BABYLON.Vector3(0, -13, 0);
 
   });
