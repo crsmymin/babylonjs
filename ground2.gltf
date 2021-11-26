@@ -139,10 +139,10 @@
   ],
   "images": [
     {
-      "uri": "textures/material_0_diffuse.png"
+      "uri": "textures/material_0_diffuse5.png"
     },
     {
-      "uri": "textures/material_0_specularGlossiness.png"
+      "uri": "textures/material_0_specularGlossiness5.png"
     }
   ],
   "materials": [
