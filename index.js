@@ -59,13 +59,12 @@ var createScene = function () {
   skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
   skybox.material = skyboxMaterial;
 
+  var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
   var deg = Math.PI / 2;
 
   // attact model name   
   var attachLabel = function attachLabel(modelName, modelText, modelPositionY) {
     // GUI
-    var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-
     var rect1 = new BABYLON.GUI.Rectangle();
     rect1.parent = modelName;
     rect1.width = "180px";
@@ -85,66 +84,91 @@ var createScene = function () {
     rect1.addControl(label);
   }
 
+
+  var descText = [
+    "Alvar Aalto je covjek koji je donio mnogo yivota u umeetnost i ondiod a odwad woda wdmmw dmaod wa daw dmwad owaodoawodo mwmdm amw mwamm mamdm mda owuoaduoawud mamdmawmdm akdogjo dwadawdaw",
+    "Alvar Aalto je covjek koji je donio mnogo yivota u umeetnost i ondiod a odwad woda wdmmw dmaod wa daw dmwad owaodoawodo mwmdm amw mwamm mamdm mda owuoaduoawud mamdmawmdm",
+    "Alvar Aalto je covjek koji je donio mnogo yivota u umeetnost i ondiod a odwad woda wdmmw dmaod wa daw dmwad owaodoawodo mwmdm amw mwamm mamdm mda",
+    "Alvar Aalto je covjek koji je donio mnogo yivota u umeetnost i ondiod a odwad woda wdmmw dmaod wa daw dmwad owaodoawodo mwmdm amw",
+  ]
+  var enterImage = new BABYLON.GUI.Image("but", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/textures/enterance.png");
+  var descTextOnMesh;
+
   // hover mesh event
-  var descTextOnMesh = function descTextOnMesh(rectWidth, rectHeight, targetMesh) {
-    // GUI
-    var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    advancedTexture.useInvalidateRectOptimization = false;
+  function makeDescription(targetMesh) {
+    //     function descTextOnMesh (targetMesh,rectWidth,rectHeight,offsetY,descScaleX,descScaleY,descriptions) {
 
-    let rect1 = new BABYLON.GUI.Rectangle();
-    advancedTexture.addControl(rect1);
-    rect1.width = rectWidth;
-    rect1.height = rectHeight;
-    rect1.thickness = 2;
-    rect1.linkOffsetX = "150px";
-    rect1.linkOffsetY = "-100px";
-    rect1.transformCenterX = 0;
-    rect1.transformCenterY = 1;
-    rect1.background = "grey";
-    rect1.alpha = 0.7;
-    rect1.scaleX = 0;
-    rect1.scaleY = 0;
-    rect1.cornerRadius = 30
-    rect1.linkWithMesh(targetMesh);
+    //     // description for model
+    //     let descWrap = new BABYLON.GUI.Rectangle();
+    //     advancedTexture.addControl(descWrap);
+    //     descWrap.width = rectWidth;
+    //     descWrap.height = rectHeight;
+    //     descWrap.thickness = 2;        
+    //     descWrap.background = "black";
+    //     descWrap.scaleX = descScaleX;
+    //     descWrap.scaleY = descScaleY;
+    //     descWrap.alpha = 0.7;
+    //     descWrap.cornerRadius = 30;
+    //     descWrap.linkWithMesh(targetMesh);    
+    //     descWrap.linkOffsetX = 0;
+    //     descWrap.linkOffsetY = offsetY;
 
-    let text1 = new BABYLON.GUI.TextBlock();
-    text1.text = "Alvar Aalto je covjek koji je donio mnogo yivota u umeetnost i ondiod a odwad woda wdmmw dmaod wa daw dmwad owaodoawodo mwmdm amw mwamm mamdm mda owuoaduoawud mamdmawmdm akdogjo dwadawdaw";
-    text1.color = "White";
-    text1.fontSize = 14;
-    text1.textWrapping = true;
-    text1.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-    text1.background = '#006994'
-    rect1.addControl(text1)
-    text1.alpha = (1 / text1.parent.alpha);
-    text1.paddingTop = "20px";
-    text1.paddingBottom = "20px";
-    text1.paddingLeft = "20px";
-    text1.paddingRight = "20px";
+    //     let desc = new BABYLON.GUI.TextBlock();
+    //     desc.text = descriptions;
+    //     desc.color = "White";
+    //     desc.fontSize = 14;
+    //     desc.textWrapping = true;
+    //     desc.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+    //     desc.paddingTop = "15px";
+    //     desc.paddingBottom = "15px";
+    //     desc.paddingLeft = "15px";
+    //     desc.paddingRight = "15px";
+    //     descWrap.addControl(desc);
+    //   }
+    targetMesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
+      document.body.style.cursor = 'pointer';
+
+    }));
+    targetMesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
+      document.body.style.cursor = ''
+
+    }));
   }
 
 
 
-  //  click mesh event    
-  var animateCameraTargetToPosition = function (cam, speed, frameCount, newPos) {
-    var ease = new BABYLON.CubicEase();
-    ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
-    var aable1 = BABYLON.Animation.CreateAndStartAnimation('at5', cam, 'target', speed, frameCount, cam.target, newPos, 0, ease);
-    aable1.disposeOnEnd = true;
-  }
-  var animateCameraToPosition = function (cam, speed, frameCount, newPos) {
-    var ease = new BABYLON.CubicEase();
-    ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
-    var aable2 = BABYLON.Animation.CreateAndStartAnimation('at4', cam, 'position', speed, frameCount, cam.position, newPos, 0, ease);
-    aable2.disposeOnEnd = true;
-  }
-  var speed = 60;
-  var frameCount = 180;
+  //  click mesh event   
+  function clickMeshEvent(target) {
 
-  var clickStation = function clickStation(targetMesh, xVal, zVal) {
-    var clickedMesh = targetMesh;
-    animateCameraTargetToPosition(camera, speed, frameCount, new BABYLON.Vector3(clickedMesh._absolutePosition._x, 0, clickedMesh._absolutePosition._z));
-    animateCameraToPosition(camera, speed, frameCount, new BABYLON.Vector3(clickedMesh._absolutePosition._x - xVal, 50, clickedMesh._absolutePosition._z + zVal));
+    var animateCameraTargetToPosition = function (cam, speed, frameCount, newPos) {
+      var ease = new BABYLON.CubicEase();
+      ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+      var aable1 = BABYLON.Animation.CreateAndStartAnimation('at5', cam, 'target', speed, frameCount, cam.target, newPos, 0, ease);
+      aable1.disposeOnEnd = true;
+    }
+
+    var animateCameraToPosition = function (cam, speed, frameCount, newPos) {
+      var ease = new BABYLON.CubicEase();
+      ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+
+      var aable2 = BABYLON.Animation.CreateAndStartAnimation('at4', cam, 'position', speed, frameCount, cam.position, newPos, 0, ease);
+      aable2.disposeOnEnd = true;
+    }
+
+    var speed = 60;
+    var frameCount = 180;
+
+    var clickStation = function clickStation(targetMesh, xVal, zVal) {
+      var clickedMesh = targetMesh;
+      animateCameraTargetToPosition(camera, speed, frameCount, new BABYLON.Vector3(clickedMesh._absolutePosition._x, 0, clickedMesh._absolutePosition._z));
+      animateCameraToPosition(camera, speed, frameCount, new BABYLON.Vector3(clickedMesh._absolutePosition._x - xVal, 50, clickedMesh._absolutePosition._z + zVal));
+    }
+
+    target.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
+      clickStation(ev.source, 0, -100);
+    }));
   }
+
 
   // load ground
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-map.gltf", scene, function (newMeshes) {
@@ -159,6 +183,7 @@ var createScene = function () {
   // load stadium
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-stadium.gltf", scene, function (newMeshes) {
     var stadium = newMeshes[0];
+    console.log(newMeshes);
     stadium.id = "stadium";
     stadium.name = "stadium";
     stadium.scaling.scaleInPlace(1500);
@@ -169,22 +194,8 @@ var createScene = function () {
     stadium.actionManager.isRecursive = true;
     stadium.isPickable = true;
 
-
-    stadium.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
-      clickStation(ev.source, 0, -100);
-    }));
-    stadium.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
-      // write somthing ... 
-      document.body.style.cursor = 'pointer';
-      descTextOnMesh(100, 50, ev.source);
-
-    }));
-    stadium.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
-      // write somthing ...
-      document.body.style.cursor = ''
-      
-    }));
-
+    clickMeshEvent(stadium);
+    makeDescription(stadium);
   });
 
 
@@ -196,27 +207,12 @@ var createScene = function () {
     tower.scaling.scaleInPlace(1500)
     tower.position = new BABYLON.Vector3(55, 14, 50);
     tower.rotation = new BABYLON.Vector3(0, 0, 0);
-
-    // attachButton(tower, "tower shop", 10, -3);
-
     attachLabel(newMeshes[1], "V-Commerce", -60);
     tower.actionManager = new BABYLON.ActionManager(scene);
     tower.actionManager.isRecursive = true;
 
-    tower.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
-      clickStation(ev.source, 0, -100);
-    }));
-    tower.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
-      // write somthing ... 
-      document.body.style.cursor = 'pointer'
-      // scene.beginAnimation(rect1, 0, 10, false);
-    }));
-    tower.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
-      // write somthing ...
-      document.body.style.cursor = ''
-      // scene.beginAnimation(rect1, 10, 0, false);
-    }));
-
+    clickMeshEvent(tower)
+    makeDescription(tower);
   });
 
   // load palace
@@ -227,27 +223,12 @@ var createScene = function () {
     palace.scaling.scaleInPlace(1200);
     palace.position = new BABYLON.Vector3(0, -10, 0);
     palace.rotation = new BABYLON.Vector3(0, 0, 0);
-
-
     attachLabel(newMeshes[1], "Promotion Room", -60);
-
     palace.actionManager = new BABYLON.ActionManager(scene);
     palace.actionManager.isRecursive = true;
 
-    palace.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
-      clickStation(ev.source, 0, -100);
-    }));
-    palace.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
-      // write somthing ... 
-      document.body.style.cursor = 'pointer'
-      // scene.beginAnimation(rect1, 0, 10, false);
-    }));
-    palace.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function (ev) {
-      // write somthing ...
-      document.body.style.cursor = ''
-      // scene.beginAnimation(rect1, 10, 0, false);
-    }));
-
+    clickMeshEvent(palace);
+    makeDescription(palace);
   });
 
   // load billboard
@@ -258,66 +239,73 @@ var createScene = function () {
     billboard.scaling.scaleInPlace(1200);
     billboard.position = new BABYLON.Vector3(120, 0, 145);
     billboard.rotation = new BABYLON.Vector3(0, 0, 0);
+
+    attachLabel(newMeshes[1], "Billboard", -120);
+
+    billboard.actionManager = new BABYLON.ActionManager(scene);
+    billboard.actionManager.isRecursive = true;
+
+    makeDescription(billboard);
   });
 
 
-  // load ufo
-  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ufo.gltf", scene, function (newMeshes) {
-    var ufo = newMeshes[0];
-    ufo.id = "ufo";
-    ufo.name = "ufo";
-    ufo.scaling.scaleInPlace(0.015);
+  //   // load ufo
+  //     BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ufo.gltf", scene, function (newMeshes) {
+  //       var ufo = newMeshes[0];
+  //       ufo.id = "ufo";
+  //       ufo.name = "ufo";
+  //       ufo.scaling.scaleInPlace(0.015);
 
-    scene.actionManager = new BABYLON.ActionManager(scene);
+  //       scene.actionManager = new BABYLON.ActionManager(scene);
 
-    // Animations
-    var alpha = 0;
-    var alpha2 = 0;
-    scene.registerBeforeRender(function () {
-      ufo.position.x = 250 * Math.cos(alpha);
-      ufo.position.y = 65;
-      ufo.position.z = 250 * Math.sin(alpha);
-      ufo.rotation = new BABYLON.Vector3(0, alpha2, 0);
+  //       // Animations
+  //       var alpha = 0;
+  //       var alpha2 = 0;
+  //       scene.registerBeforeRender(function () {
+  //         ufo.position.x = 250 * Math.cos(alpha);
+  //         ufo.position.y = 65;
+  //         ufo.position.z = 250 * Math.sin(alpha);
+  //         ufo.rotation = new BABYLON.Vector3(0,alpha2,0);
 
-      alpha += 0.005;
-      alpha2 += 0.03;
+  //         alpha += 0.005;
+  //         alpha2 += 0.03;
 
-    });
-  });
+  //       });
+  //     });
 
-  // load bird
-  BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "bird.gltf", scene, function (newMeshes) {
-    var bird = newMeshes[0];
-    bird.id = "bird";
-    bird.name = "bird";
-    bird.scaling.scaleInPlace(1.8);
-    bird.position = new BABYLON.Vector3(215, 90, 20);
-    bird.rotation = new BABYLON.Vector3(0, deg * 3.1, 0);
+  //   // load bird
+  //     BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "bird.gltf", scene, function (newMeshes) {
+  //       var bird = newMeshes[0];
+  //       bird.id = "bird";
+  //       bird.name = "bird";
+  //       bird.scaling.scaleInPlace(1.8);
+  //       bird.position = new BABYLON.Vector3(215,90,20);
+  //       bird.rotation = new BABYLON.Vector3(0,deg*3.1,0);
 
 
-    var bird2 = bird.clone("bird2");
-    bird2.id = "bird2";
-    bird2.name = "bird2";
-    bird2.position = new BABYLON.Vector3(-215, 90, -20);
-    bird2.rotation = new BABYLON.Vector3(0, deg * 1.1, 0);
+  //       var bird2 = bird.clone("bird2");
+  //       bird2.id = "bird2";
+  //       bird2.name = "bird2";
+  //       bird2.position = new BABYLON.Vector3(-215,90,-20);
+  //       bird2.rotation = new BABYLON.Vector3(0,deg*1.1,0);
 
-    scene.actionManager = new BABYLON.ActionManager(scene);
+  //       scene.actionManager = new BABYLON.ActionManager(scene);
 
-    // Animations
-    scene.registerBeforeRender(function () {
-      bird.position.x += 0.5;
-      bird2.position.x -= 0.5;
+  //       // Animations
+  //       scene.registerBeforeRender(function () {    
+  //           bird.position.x += 0.5;
+  //           bird2.position.x -= 0.5;
 
-      if (bird.position.x > 250) {
-        bird.position.x = -250;
-      }
+  //           if (bird.position.x > 250) {
+  //               bird.position.x = -250;  
+  //           }
 
-      if (bird2.position.x < -250) {
-        bird2.position.x = 250;
-      }
+  //           if(bird2.position.x < -250) {
+  //               bird2.position.x = 250;
+  //           } 
 
-    });
-  });
+  //       });
+  //     });
 
 
   var planeOpts = {
@@ -336,19 +324,20 @@ var createScene = function () {
   ANote0VideoMat.roughness = 1;
   ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
   ANote0Video.material = ANote0VideoMat;
-  scene.onPointerObservable.add(function (evt) {
-    if (evt.pickInfo.pickedMesh === ANote0Video) {
-      //console.log("picked");            
-      if (ANote0VideoVidTex.video.paused) {
-        ANote0VideoVidTex.video.play();
-        alert("play video");
-      } else {
-        alert("paused video");
-        ANote0VideoVidTex.video.pause();
-        console.log(ANote0VideoVidTex.video.paused ? "paused" : "playing");
-      }
-    }
-  }, BABYLON.PointerEventTypes.POINTERPICK);
+  //   scene.onPointerObservable.add(function(evt){
+  //       if(evt.pickInfo.pickedMesh === ANote0Video){
+  //           //console.log("picked");            
+  //           if(ANote0VideoVidTex.video.paused) {
+  //               ANote0VideoVidTex.video.play();
+  //               alert("play video");
+  //           }
+  //           else {
+  //               alert("paused video");
+  //               ANote0VideoVidTex.video.pause();
+  //               console.log(ANote0VideoVidTex.video.paused?"paused":"playing");
+  //           }
+  //       }
+  //   }, BABYLON.PointerEventTypes.POINTERPICK);
 
   return scene;
 }
