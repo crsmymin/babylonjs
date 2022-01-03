@@ -30,8 +30,8 @@ var createScene = function () {
   camera.lowerBetaLimit = 0.9;
   camera.upperBetaLimit = 1.3;
   camera.angularSensibilityX = 5000;
-  //   camera.lowerRadiusLimit = 50;
-  //   camera.upperRadiusLimit = 500;
+  camera.lowerRadiusLimit = 100;
+  camera.upperRadiusLimit = 600;
   camera.panningDistanceLimit = 1;
   camera.wheelPrecision = 1;
   camera.pinchPrecision = 0.5;
@@ -91,7 +91,7 @@ var createScene = function () {
     rect1.parent = modelName;
     rect1.width = "180px";
     rect1.height = "35px";
-    rect1.thickness = 2;
+    rect1.thickness = 0;
     rect1.background = "black";
     rect1.alpha = 0.6;
     rect1.cornerRadius = 25;
@@ -126,7 +126,7 @@ var createScene = function () {
     descWrap.background = "black";
     descWrap.scaleX = 0;
     descWrap.scaleY = 0;
-    descWrap.alpha = 0.7;
+    descWrap.alpha = 0.6;
     descWrap.cornerRadius = 30;
     descWrap.linkWithMesh(target);
     descWrap.linkOffsetX = 0;
@@ -157,17 +157,17 @@ var createScene = function () {
   }
 
   // image gui
-  function attactLinkButton(target, scaleX, scaleY, offsetY, targetLink) {
+  var attactLinkButton = function attactLinkButton(target, scaleX, scaleY, offsetY, targetLink) {
     var enterButton = BABYLON.GUI.Button.CreateImageButton("but", "", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/textures/enterance.png");
-    enterButton.width = "85px";
-    enterButton.height = "85px";
+    enterButton.width = "65px";
+    enterButton.height = "65px";
     enterButton.scaleX = 0 + scaleX;
     enterButton.scaleY = 0 + scaleY;
     enterButton.thickness = 0;
     enterButton.alpha = 0.9;
     enterButton.cornerRadius = 250;
-    enterButton.image.width = "85px";
-    enterButton.image.height = "85px";
+    enterButton.image.width = "100%";
+    enterButton.image.height = "100%";
     advancedTexture.addControl(enterButton);
     enterButton.linkWithMesh(target);
     enterButton.linkOffsetY = offsetY
@@ -205,25 +205,36 @@ var createScene = function () {
     target.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
       clickStation(ev.source, xVal, zVal, yVal);
       attactLinkButton(btnPos, 1, 1, btnPosY, targetLink);
+      camera.detachControl();
     }));
   }
 
 
-  function initCamera(cam, speed, frameCount, newPos) {
-    var aable = BABYLON.Animation.CreateAndStartAnimation('at4', cam, 'position', speed, frameCount, cam.position, newPos, 0);
-    aable.disposeOnEnd = true;
+  function moveTo(cam, target, alpha, beta, radius, endCallBack = () => {}) {
+    camera.lowerRadiusLimit = 0;
+    var ease = new BABYLON.PowerEase();
+    ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+    BABYLON.Animation.CreateAndStartAnimation('targetMove', cam, 'target', 50, 80, cam.target, target, 0, ease);
+    BABYLON.Animation.CreateAndStartAnimation('alphaMove', cam, 'alpha', 50, 80, cam.alpha, alpha, 0, ease);
+    BABYLON.Animation.CreateAndStartAnimation('betaMove', cam, '', 50, 80, cam.beta, beta, 0, ease);
+    BABYLON.Animation.CreateAndStartAnimation('cameraMove', cam, 'radius', 50, 80, cam.radius, radius, 0, ease, () => {
+      camera.lowerRadiusLimit = radius;
+      if (endCallBack) endCallBack();
+    });
   }
 
   //   scroll observer
   $(window).bind('wheel', function (event) {
-    var speed = 35;
-    var frameCount = 60;
     if (event.originalEvent.wheelDelta < 0) {
       if (event.originalEvent.deltaY > 0) {
-        // camera.detachControl();
-        initCamera(camera, speed, frameCount, new BABYLON.Vector3(0, 500, -700));
-        // camera.attachControl();
+        moveTo(camera, new BABYLON.Vector3(0, 0, 0), 4.7124, 0.95, 600, () => {
+          camera.lowerRadiusLimit = 50;
+          camera.upperRadiusLimit = 600;
+          camera.attachControl();
+        })
       }
+    } else {
+
     }
   });
 
