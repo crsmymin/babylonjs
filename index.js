@@ -38,6 +38,7 @@ var createScene = function () {
   camera.pinchZoom = true;
   camera.setPosition(new BABYLON.Vector3(0, 500, -700));
   camera.attachControl(canvas, true, false, 3);
+  camera.setTarget(BABYLON.Vector3.Zero());
 
   // Lights
   var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
@@ -205,7 +206,7 @@ var createScene = function () {
     target.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
       clickStation(ev.source, xVal, zVal, yVal);
       attactLinkButton(btnPos, 1, 1, btnPosY, targetLink);
-      camera.detachControl();
+      // camera.detachControl();
     }));
   }
 
@@ -223,19 +224,143 @@ var createScene = function () {
     });
   }
 
-  //   scroll observer
-  $(window).bind('wheel', function (event) {
-    if (event.originalEvent.wheelDelta < 0) {
-      if (event.originalEvent.deltaY > 0) {
-        moveTo(camera, new BABYLON.Vector3(0, 0, 0), 4.7124, 0.95, 600, () => {
-          camera.lowerRadiusLimit = 50;
-          camera.upperRadiusLimit = 600;
-          camera.attachControl();
-        })
-      }
-    } else {
+  // //   scroll observer
+  // $(window).bind('wheel', function (event) {
+  //   if (event.originalEvent.wheelDelta < 0) {
+  //     if (event.originalEvent.deltaY > 0) {
+  //       moveTo(camera, new BABYLON.Vector3(0, 0, 0), 4.7124, 0.95, 600, () => {
+  //         camera.lowerRadiusLimit = 50;
+  //         camera.upperRadiusLimit = 600;
+  //         camera.attachControl();
+  //       })
+  //     }
+  //   } else {
 
-    }
+  //   }
+  // });
+
+  // Keyboard events
+  var inputMap = {};
+  scene.actionManager = new BABYLON.ActionManager(scene);
+  scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
+    inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+  }));
+  scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
+    inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+  }));
+
+  // Load hero character
+  var hvgirl = BABYLON.SceneLoader.ImportMesh("", "./", "player.glb", scene, function (newMeshes, particleSystems, skeletons, animationGroups) {
+    var skeleton = skeletons[0];
+    skeleton.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
+    skeleton.animationPropertiesOverride.enableBlending = true;
+    skeleton.animationPropertiesOverride.blendingSpeed = 0.05;
+    skeleton.animationPropertiesOverride.loopMode = 1;
+
+    
+    var hero = newMeshes[0];
+    // hero.material = new MToonMaterial('mat1', scene);
+    //Scale the model down        
+    hero.scaling.scaleInPlace(5);
+    hero.position = new BABYLON.Vector3(30, -10, 0)
+    //Lock camera on the character 
+    // camera.target = hero;
+
+    var cc = new CharacterController(hero, camera, scene, agMap);
+    cc.start();
+
+    console.log(newMeshes[0]);
+
+    var animating = false;
+
+    var walkAnim = scene.getAnimationGroupByName("run");
+    var walkBackAnim = scene.getAnimationGroupByName("WalkingBack");
+    var idleAnim = scene.getAnimationGroupByName("idle");
+    var jumpAnim = scene.getAnimationGroupByName("jump");
+
+    idleAnim.start(true, 1.0, idleAnim.from, idleAnim.to, false);
+    
+    // var cc = new CharacterController(hero, camera, scene);
+    // cc.start();
+    //Rendering loop (executed for everyframe)
+    scene.onBeforeRenderObservable.add(() => {
+      var keydown = false;
+      if (inputMap["w"] || inputMap["ArrowUp"]) {
+        hero.position.z += 0.5;
+        hero.rotation.y = 0;
+        keydown = true;
+        camera.target = hero;
+      }
+      if (inputMap["a"] || inputMap["ArrowLeft"]) {
+        hero.position.x -= 0.5;
+        hero.rotation.y = 3 * Math.PI / 2;
+        keydown = true;
+        camera.target = hero;
+      }
+      if (inputMap["s"] || inputMap["ArrowDown"]) {
+        hero.position.z -= 0.5;
+        hero.rotation.y = 2 * Math.PI / 2;
+        keydown = true;
+        camera.target = hero;
+      }
+      if (inputMap["d"] || inputMap["ArrowRight"]) {
+        hero.position.x += 0.5;
+        hero.rotation.y = Math.PI / 2;
+        keydown = true;
+        camera.target = hero;
+      }
+      //Jump Checks (SPACE)
+      if (inputMap[" "]) {
+        console.log("jump up");
+        
+          // this.jumpKeyDown = true;
+      } else {
+        
+          // this.jumpKeyDown = false;
+      }
+    
+      //Manage animations to be played  
+      if (keydown) {
+        if (!animating) {
+          animating = true;
+          if (inputMap["s"]) {
+            //Walk backwards
+            walkAnim.start(true, 1.0, walkAnim.from, walkAnim.to, false);
+            // scene.beginAnimation(skeleton, walkRange.from, walkRange.to, true);
+          } else {
+            //Walk
+            walkAnim.start(true, 1.0, walkAnim.from, walkAnim.to, false);
+            // scene.beginAnimation(skeleton, walkRange.from, walkRange.to, true);
+          }
+        }
+      } 
+      else {
+
+        if (animating) {
+          //Default animation is idle when no key is down     
+          idleAnim.start(true, 1.0, idleAnim.from, idleAnim.to, false);
+
+          //Stop all animations besides Idle Anim when no key is down
+          walkAnim.stop();
+          // walkBackAnim.stop();
+
+          //Ensure animation are played only once per rendering loop
+          animating = false;
+        }
+      }
+    });
+  });
+
+  hvgirl.material = new MToonMaterial('mat11', scene);
+
+  // load ground
+  BABYLON.SceneLoader.ImportMesh("", "./", "golem.gltf", scene, function (newMeshes) {
+    var ground = newMeshes[0];
+    ground.id = "ground";
+    ground.name = "ground";
+    ground.scaling = new BABYLON.Vector3(-14, 14, 14);
+    ground.rotation = new BABYLON.Vector3(0, deg * 2, 0);
+    ground.position = new BABYLON.Vector3(200, -5, 0);
   });
 
   // load ground
@@ -276,6 +401,7 @@ var createScene = function () {
     tower.rotation = new BABYLON.Vector3(0, 0, 0);
     tower.actionManager = new BABYLON.ActionManager(scene);
     tower.actionManager.isRecursive = true;
+    tower.material = new MToonMaterial('mat1', scene);
 
     attachLabel(newMeshes[1], "V-Commerce", 30);
     clickMeshEvent(tower, 0, -100, 60, newMeshes[1], "-55px", linkUrl[1]);
@@ -284,6 +410,7 @@ var createScene = function () {
 
   // load palace
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-gung.gltf", scene, function (newMeshes) {
+    BABYLON.Mesh.FRONTSIDE;
     var palace = newMeshes[0];
     palace.id = "palace";
     palace.name = "palace";
@@ -297,6 +424,14 @@ var createScene = function () {
     clickMeshEvent(palace, 0, -100, 0, newMeshes[1], "50px", linkUrl[2]);
     makeDescription(palace, newMeshes[1], "330px", "60px", "-120px", descText[2]);
   });
+
+
+  const sphere = BABYLON.Mesh.CreateSphere('sphere1', 16, 50, scene, false, BABYLON.Mesh.FRONTSIDE);
+  sphere.position.y = 160;
+  sphere.position.x = -110;
+
+  // Assign MToonMaterial
+  sphere.material = new MToonMaterial('mat11', scene);
 
   // load billboard
   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-pan.gltf", scene, function (newMeshes) {
@@ -369,22 +504,22 @@ var createScene = function () {
   //     makeDescription(bird,newMeshes[1],"200px","40px","-50px",descText[4]);
   //   });
 
-  var planeOpts = {
-    height: 5.4762,
-    width: 7.3967,
-    sideOrientation: BABYLON.Mesh.DOUBLESIDE
-  };
-  var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
-  var vidPos = (new BABYLON.Vector3(120, 20, 142))
-  ANote0Video.position = vidPos;
-  ANote0Video.scaling = new BABYLON.Vector3(9, 6.8, 1);
-  ANote0Video.rotation = new BABYLON.Vector3(0, 0, 0);
-  var ANote0VideoMat = new BABYLON.StandardMaterial("m", scene);
-  var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex", "textures/babylonjs.mp4", scene);
-  ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
-  ANote0VideoMat.roughness = 1;
-  ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
-  ANote0Video.material = ANote0VideoMat;
+  // var planeOpts = {
+  //   height: 5.4762,
+  //   width: 7.3967,
+  //   sideOrientation: BABYLON.Mesh.DOUBLESIDE
+  // };
+  // var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
+  // var vidPos = (new BABYLON.Vector3(120, 20, 142))
+  // ANote0Video.position = vidPos;
+  // ANote0Video.scaling = new BABYLON.Vector3(9, 6.8, 1);
+  // ANote0Video.rotation = new BABYLON.Vector3(0, 0, 0);
+  // var ANote0VideoMat = new BABYLON.StandardMaterial("m", scene);
+  // var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex", "textures/babylonjs.mp4", scene);
+  // ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
+  // ANote0VideoMat.roughness = 1;
+  // ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
+  // ANote0Video.material = ANote0VideoMat;
   //   scene.onPointerObservable.add(function(evt){
   //       if(evt.pickInfo.pickedMesh === ANote0Video){
   //           //console.log("picked");            
@@ -398,7 +533,7 @@ var createScene = function () {
   //               console.log(ANote0VideoVidTex.video.paused?"paused":"playing");
   //           }
   //       }
-  //   }, BABYLON.PointerEventTypes.POINTERPICK);
+  //   }, BABYLON.PointerEventTypes.POINTERPICK);  
 
   return scene;
 }
