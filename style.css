@@ -1,0 +1,159 @@
+html,
+body {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#renderCanvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  outline: none;
+  z-index: 1;
+}
+
+#loadingScreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url(./assets/img/loading.jpeg);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 2;
+  transition: all 1s;
+}
+
+#loadingScreen.disapear {
+  opacity: 0;
+  z-index: -1;
+}
+
+#loadingBar {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 15px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 25px;
+}
+
+#gauge {
+  width: 45%;
+  height: 100%;
+  background-color: rgb(0, 184, 0);
+  border-radius: 25px;
+}
+
+#textArea {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#screenTitle {
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 4px 4px 3px #ddd;
+  font-size: 6vw;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+#status {
+  display: block;
+  text-align: center;
+  margin: 30px 0 0;
+  font-size: 2vw;
+  color: #fff;
+  text-transform: capitalize;
+  animation-name: blink;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+#btnEnter {
+  text-align: center;
+  margin: 30px 0 0;
+  font-size: 1.3vw;
+  color: #fff;
+  text-transform: capitalize;
+  background-color: rgb(0, 184, 0);
+  border: 2px solid yellowgreen;
+  border-radius: 15px;
+  display: none;
+  margin: 0 auto;
+  padding: 8px 25px;
+  cursor: pointer;
+}
+
+/* content modal */
+#contentModal {
+  position: absolute;
+  top: 0;
+  right: -35%;
+  width: 35%;
+  height: 33.33333%;
+  background-color: rgba(255, 255, 255, 0.5);
+  transition: all .3s;
+  -webkit-transition: all .3s;
+  -moz-transition: all .3s;
+  -ms-transition: all .3s;
+  -o-transition: all .3s;
+}
+#contentModal.open {
+  right: 0;
+}
+#contentModal h3 {
+  margin: 0;
+  padding: 65px 10px 10px;
+  border-bottom: 2px dashed #ddd;
+}
+#contentModal #link {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+#contentModal #link img {
+  width: 40px;
+}
+#contentModal .desc {
+  padding: 10px;
+  margin: 0;
+}
+#closeContentModal {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+#closeContentModal img {
+  width: 35px;
+}
