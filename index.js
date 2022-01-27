@@ -23,9 +23,16 @@ if (document.readyState === "complete") {
       document.getElementById("status").style.display = "none";
       document.getElementById("btnEnter").style.display = "block";
     }, 2000)
-    setTimeout(function () {
-      loadingScreenDiv.classList.add("disapear");
-    }, 15000)
+    // setTimeout(function () {
+    //   loadingScreenDiv.classList.add("disapear");
+    // }, 15000);
+
+    var swiper = new Swiper(".mySwiper", {
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    });
   });
 }
 
@@ -57,12 +64,13 @@ var createScene = function () {
 
   // Scene and Camera
   var scene = new BABYLON.Scene(engine);
-
   var camera = new BABYLON.ArcRotateCamera("main camera", 1.6, 1.13, 12.5, new BABYLON.Vector3(0, 0, 0), scene);
   scene.activeCamera = camera;
   scene.activeCamera.attachControl(canvas, true);
-
-  // scene.debugLayer.show();
+  scene.debugLayer.show();
+  // define degree
+  var deg = Math.PI / 2;
+  var deg1 = deg / 90;
 
   // camera
   camera.minZ = 1;
@@ -70,69 +78,97 @@ var createScene = function () {
   camera.lowerBetaLimit = 0.9;
   camera.upperBetaLimit = 1.3;
   camera.angularSensibilityX = 5000;
-  camera.lowerRadiusLimit = 120;
-  camera.upperRadiusLimit = 450;
+  camera.lowerRadiusLimit = 150;
+  camera.upperRadiusLimit = 410;
   camera.panningDistanceLimit = 1;
   camera.wheelPrecision = 1;
   camera.pinchPrecision = 0.5;
   camera.pinchZoom = true;
-  camera.setPosition(new BABYLON.Vector3(0, 500, -700));
+  camera.setPosition(new BABYLON.Vector3(800, 300, 0));
   camera.attachControl(canvas, true, false, 3);
   camera.setTarget(BABYLON.Vector3.Zero());
   camera.inputs.attached.mousewheel.wheelPrecisionY = 100;
 
   // Lights
-  var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-  var light3 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(0.5, 1, 0), scene);
-  light.intensity = 1;
-  light3.intensity = 1;
-  light.specular = BABYLON.Color3.Black();
-  light3.specular = BABYLON.Color3.Black();
+  var light = new BABYLON.DirectionalLight("dirlight", new BABYLON.Vector3(-1, -1, 0), scene);
+  light.position = new BABYLON.Vector3(0, 200, 0);
+  light.intensity = 1.5;
 
-  // // sphere skybox
-  //  var skybox = BABYLON.MeshBuilder.CreateSphere("skyBox", {diameter:2000, sideOrientation:2}, scene);
-  // 	var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-  // 	//skyboxMaterial.backFaceCulling = false;
-  // 	skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("https://raw.githubusercontent.com/crsmymin/babylonjs/master/textures/skybox", scene);
-  // 	skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-  // 	skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-  // 	skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-  // 	skybox.material = skyboxMaterial;		
+  var light2 = new BABYLON.HemisphericLight("hemislight", new BABYLON.Vector3(0, 1, 0), scene);
+  light2.intensity = 0.8;
+  light2.specular = BABYLON.Color3.Black();
 
-  //   cube skybox
-  // var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {
-  //   size: 3600
-  // }, scene);
-  // var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-  // skyboxMaterial.backFaceCulling = false;
-  // skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/TropicalSunnyDay", scene);
-  // skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-  // skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-  // skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-  // skybox.material = skyboxMaterial;
+  var text = "오늘의 공연";
+  var text2 = "진행예정";
 
   var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-  var deg = Math.PI / 2;
+
+  //Set width an height for plane
+  var planeWidth = 10;
+  var planeHeight = 3;
+  //Create plane
+  var plane = BABYLON.MeshBuilder.CreatePlane("plane", {
+    width: planeWidth,
+    height: planeHeight
+  }, scene);
+  plane.position = new BABYLON.Vector3(118, 6.5, -26.7);
+  plane.rotation = new BABYLON.Vector3(0, deg1 * 250, 0);
+  plane.scaling = new BABYLON.Vector3(1.7, 1.3, 1.3);
+  var plane2 = BABYLON.MeshBuilder.CreatePlane("plane2", {
+    width: planeWidth,
+    height: planeHeight
+  }, scene);
+  plane2.position = new BABYLON.Vector3(118, 6.5, 29.8);
+  plane2.rotation = new BABYLON.Vector3(0, deg1 * 290, 0);
+  plane2.scaling = new BABYLON.Vector3(1.7, 1.3, 1.3);
+  //Set width and height for dynamic texture using same multiplier
+  var DTWidth = planeWidth * 60;
+  var DTHeight = planeHeight * 60;
+  //Create dynamic texture
+  var dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", {
+    width: DTWidth,
+    height: DTHeight
+  }, scene);
+  var dynamicTexture2 = new BABYLON.DynamicTexture("DynamicTexture2", {
+    width: DTWidth,
+    height: DTHeight
+  }, scene);
+  //Check width of text for given font type at any size of font
+  var ctx = dynamicTexture.getContext();
+  var size = 12; //any value will work
+  //Set font 
+  var font_type = "Arial";
+  ctx.font = size + "px " + font_type;
+  var font = "bold " + 100 + "px " + font_type;
+  //Draw text
+  dynamicTexture.drawText(text, null, null, font, "#000000", "#ffffff", true);
+  dynamicTexture2.drawText(text2, null, null, font, "#000000", "#ffffff", true);
+  //create material
+  var mat = new BABYLON.StandardMaterial("mat", scene);
+  var mat2 = new BABYLON.StandardMaterial("mat2", scene);
+  mat.diffuseTexture = dynamicTexture;
+  mat2.diffuseTexture = dynamicTexture2;
+  //apply material
+  plane.material = mat;
+  plane2.material = mat2;
+
   // description model   
-  var contentTitles = [
-    "서울시청",
-    "남산타워",
-    "창덕궁",
-    "삼성동 코엑스",
-    "보타닉파크"
+  var descSrc = [
+    "commerce.png",
+    "stage.png",
+    "camp.png",
+    "dex.png",
+    "balloon.png"
+  ]
+  var mediaSrc = [
+    "vid1.mp4",
+    "vid2.mp4"
   ]
   var descText = [
     "It’s now that cherished time of year where all across our great blue sphere we celebrate with joy and cheer that special bond that brings us here."
   ]
-  var linkUrl = [
-    "https://www.naver.com/",
-    "https://www.daum.net/",
-    "https://doc.babylonjs.com/",
-    "https://https://forum.babylonjs.com/"
-  ]
-
   // function attact model name   
-  var attachLabel = function attachLabel(modelName, modelText, modelPositionY) {
+  var attachLabel = function attachLabel(modelName, modelText, modelPositionY, modelPositionX, modelPositionZ) {
     // GUI
     var rect1 = new BABYLON.GUI.Rectangle();
     rect1.parent = modelName;
@@ -145,6 +181,8 @@ var createScene = function () {
     advancedTexture.addControl(rect1);
     rect1.linkWithMesh(modelName);
     rect1.linkOffsetY = modelPositionY;
+    rect1.linkOffsetX = modelPositionX;
+    rect1.linkOffsetZ = modelPositionZ;
 
     var label = new BABYLON.GUI.TextBlock();
     label.text = modelText;
@@ -153,13 +191,13 @@ var createScene = function () {
     rect1.addControl(label);
   }
 
-  // rotate camera
-  //   function rotateCamera() {
-  //     scene.registerBeforeRender(function () {
-  //         camera.alpha += 0.0001;
-  //     });
-  //   }
-  //   rotateCamera();
+  // rotate camera animation
+  // function rotateCamera() {
+  //   scene.registerBeforeRender(function () {
+  //       camera.alpha += 0.0001;
+  //   });
+  // }
+  // rotateCamera();
 
   // function hover mesh event
   function makeDescription(targetMesh, target, rectWidth, rectHeight, offsetY, descriptions) {
@@ -203,35 +241,18 @@ var createScene = function () {
     }));
   }
 
-  // image gui
-  var attactLinkButton = function attactLinkButton(target, scaleX, scaleY, offsetY, targetLink) {
-    var enterButton = BABYLON.GUI.Button.CreateImageButton("but", "", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/textures/enterance.png");
-    enterButton.width = "65px";
-    enterButton.height = "65px";
-    enterButton.scaleX = 0 + scaleX;
-    enterButton.scaleY = 0 + scaleY;
-    enterButton.thickness = 0;
-    enterButton.alpha = 0.9;
-    enterButton.cornerRadius = 250;
-    enterButton.image.width = "100%";
-    enterButton.image.height = "100%";
-    advancedTexture.addControl(enterButton);
-    enterButton.linkWithMesh(target);
-    enterButton.linkOffsetY = offsetY
-    enterButton.hoverCursor = "pointer";
-
-    enterButton.onPointerClickObservable.add(function () {
-      window.open(targetLink, '_blank');
-    });
-  }
-
   var contentModal = document.getElementById("contentModal");
+  var descImg = document.querySelector("#contentModal img");
   var closeContentModal = document.getElementById("closeContentModal");
-  var contentTitle = document.querySelector("#contentWrap h3");
-  var contentLink = document.querySelector("#contentWrap #link");
+  var gameMoney = document.querySelector("#gameMoney");
+  var dimLayer = document.querySelector("#dimLayer");
+  var penguinSwap = document.querySelector("#penguinSwap");
+  var mediaModal = document.querySelector("#mediaModal");
+  var videoCont = document.querySelector("#mediaWrap video");
+  var videoClose = document.getElementById("mediaClose");
 
   // function click mesh event   
-  var clickMeshEvent = function clickMeshEvent(target, xVal, zVal, yVal, btnPos, btnPosY, targetLink) {
+  var clickMeshEvent = function clickMeshEvent(target, xVal, zVal, yVal) {
     var ease = new BABYLON.CubicEase();
     var speed = 60;
     var frameCount = 180;
@@ -251,74 +272,46 @@ var createScene = function () {
       var clickedMesh = targetMesh;
       animateCameraTargetToPosition(camera, speed, frameCount, new BABYLON.Vector3(clickedMesh._absolutePosition._x, yVal, clickedMesh._absolutePosition._z));
       animateCameraToPosition(camera, speed, frameCount, new BABYLON.Vector3(clickedMesh._absolutePosition._x - xVal, 50, clickedMesh._absolutePosition._z + zVal));
+      // camera.lowerRadiusLimit = 100;
+      // camera.radius = 150;
     }
 
     target.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
       clickStation(ev.source, xVal, zVal, yVal);
       console.log(ev.source.name);
       camera.detachControl();
+      gameMoney.style.display = "none";
       contentModal.classList.add("open");
 
-      // attact modal contents
-      switch(ev.source.name) {
-        case "cityHall":
-          contentTitle.innerHTML = contentTitles[0];
-          contentLink.setAttribute("href", linkUrl[0]);
+      // attach modal contents
+      switch (ev.source.name) {
+        case "commercial":
+          descImg.setAttribute("src", "./assets/img/" + descSrc[0])
           break;
-        case "nTower":
-          contentTitle.innerHTML = contentTitles[1];
-          contentLink.setAttribute("href", linkUrl[1]);
+        case "stage":
+          descImg.setAttribute("src", "./assets/img/" + descSrc[1])
           break;
-        case "changduck":
-          contentTitle.innerHTML = contentTitles[2];
-          contentLink.setAttribute("href", linkUrl[2]);
+        case "campingZone":
+          descImg.setAttribute("src", "./assets/img/" + descSrc[2])
           break;
-        case "coex":
-          contentTitle.innerHTML = contentTitles[3];
-          contentLink.setAttribute("href", linkUrl[3]);
+        case "eventZone":
+          descImg.setAttribute("src", "./assets/img/" + descSrc[3])
           break;
-        case "botanic":
-          contentTitle.innerHTML = contentTitles[4];
-          contentLink.setAttribute("href", linkUrl[3]);
+        case "tripZone":
+          descImg.setAttribute("src", "./assets/img/" + descSrc[4])
           break;
       }
     }));
   }
 
-  // close content modal and initialize camera
-  closeContentModal.addEventListener("click", function() {
-    contentModal.classList.remove("open");
-    moveTo(camera, new BABYLON.Vector3(0, 0, 0), 4.7124, 0.95, 600, () => {
-      camera.lowerRadiusLimit = 120;
-      camera.upperRadiusLimit = 450;
-      camera.attachControl();
-    })
-  })
-
-  // var setPointerObservable = function setPointerObservable() {
-  //   scene.onPointerObservable.add((pointerInfo) => {
-  //     switch (pointerInfo.type) {
-  //       case BABYLON.PointerEventTypes.POINTERWHEEL:
-  //         if (pointerInfo.event.wheelDelta < 0) {
-  //           if (pointerInfo.event.deltaY > 0) {
-  //             // zoom out
-  //             console.log("zoom out");
-  //             scene.upperRadiusLimit = 0;
-  //             moveTo(camera, new BABYLON.Vector3(0, 0, 0), 4.7124, 0.95, 600, () => {
-  //               camera.lowerRadiusLimit = 120;
-  //               camera.upperRadiusLimit = 480;
-  //               camera.attachControl();
-  //               pointerStatus = "";
-  //             })
-  //           }
-  //         } else {
-  //           // zoom in
-  //           console.log("zoom in");
-  //         }
-  //         break;
-  //     }
-  //   });
-  // 
+  var clickCoinEvent = function clickCoinEvent(target) {
+    target.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (ev) {
+      console.log(ev.source.name);
+      camera.detachControl();
+      dimLayer.classList.add("show");
+      penguinSwap.classList.add("show");
+    }));
+  }
 
   var moveTo = function moveTo(cam, target, alpha, beta, radius, endCallBack = () => {}) {
     camera.lowerRadiusLimit = 0;
@@ -333,238 +326,185 @@ var createScene = function () {
     });
   }
 
+  // close content modal and initialize camera
+  closeContentModal.addEventListener("click", function () {
+    gameMoney.style.display = "block";
+    contentModal.classList.remove("open");
+    mediaModal.style.display = "none"
+    videoCont.setAttribute("src", "");
+    moveTo(camera, new BABYLON.Vector3(0, 0, 0), 0.055, 0.648, 410, () => {
+      camera.lowerRadiusLimit = 150;
+      camera.upperRadiusLimit = 410;
+      camera.attachControl();
+    })
+  })
+
+  // close swap screen
+  dimLayer.addEventListener("click", function () {
+    this.classList.remove("show");
+    penguinSwap.classList.remove("show");
+    camera.attachControl();
+  })
+
   // load mesh
-  BABYLON.SceneLoader.ImportMesh("", "./assets/model/", "SeoulMap_night.glb", scene, function (newMeshes) {
+  BABYLON.SceneLoader.ImportMesh("", "./assets/model/", "metakong_map3.glb", scene, function (newMeshes) {
     console.log(newMeshes);
     var ground = newMeshes[0];
     ground.id = "ground";
     ground.name = "ground";
-    ground.scaling = new BABYLON.Vector3(-25, 25, 25);
+    ground.scaling = new BABYLON.Vector3(-11, 11, 11);
     ground.rotation = new BABYLON.Vector3(0, deg * 2, 0);
     ground.position = new BABYLON.Vector3(0, -11, 0);
 
-    var cityHall = newMeshes[1];
-    cityHall.id = "cityHall";
-    cityHall.name = "cityHall";
-    cityHall.actionManager = new BABYLON.ActionManager(scene);
-    cityHall.actionManager.isRecursive = true;
-    cityHall.isPickable = true;
-    attachLabel(newMeshes[1], "시청", -30);
-    clickMeshEvent(cityHall, 0, -100, 0, newMeshes[1], "-10px", linkUrl[0], () => {
-      console.log(cityHall);
-    });
-    makeDescription(cityHall, newMeshes[1], "330px", "60px", "-120px", descText[0]);
+    var stage = newMeshes[11];
+    stage.id = "stage";
+    stage.name = "stage";
+    stage.actionManager = new BABYLON.ActionManager(scene);
+    stage.actionManager.isRecursive = true;
+    stage.isPickable = true;
+    attachLabel(newMeshes[11], "오픈스테이지", -30, 30, 200);
+    clickMeshEvent(stage, -100, -20, 0);
+    makeDescription(stage, newMeshes[11], "330px", "60px", "-120px", descText[0]);
 
-    var nTower = newMeshes[4];
-    nTower.id = "nTower";
-    nTower.name = "nTower";
-    nTower.actionManager = new BABYLON.ActionManager(scene);
-    nTower.actionManager.isRecursive = true;
-    nTower.isPickable = true;
-    attachLabel(newMeshes[4], "남산타워", -70);
-    clickMeshEvent(nTower, 0, -100, 0, newMeshes[4], "-10px", linkUrl[0], () => {
-      console.log(nTower);
-    });
-    makeDescription(nTower, newMeshes[4], "330px", "60px", "-120px", descText[0]);
+    var commercial = newMeshes[2];
+    commercial.id = "commercial";
+    commercial.name = "commercial";
+    commercial.actionManager = new BABYLON.ActionManager(scene);
+    commercial.actionManager.isRecursive = true;
+    commercial.isPickable = true;
+    attachLabel(newMeshes[2], "커머셜존", -120, -30, 0);
+    clickMeshEvent(commercial, -50, 120, 0);
+    makeDescription(commercial, newMeshes[2], "330px", "60px", "-120px", descText[0]);
 
-    var changduck = newMeshes[5];
-    changduck.id = "changduck";
-    changduck.name = "changduck";
-    changduck.actionManager = new BABYLON.ActionManager(scene);
-    changduck.actionManager.isRecursive = true;
-    changduck.isPickable = true;
-    attachLabel(newMeshes[5], "창덕궁", -30);
-    clickMeshEvent(changduck, 0, -100, 0, newMeshes[5], "-10px", linkUrl[0], () => {
-      console.log(changduck);
-    });
-    makeDescription(changduck, newMeshes[5], "330px", "60px", "-120px", descText[0]);
+    var eventZone = newMeshes[9];
+    eventZone.id = "eventZone";
+    eventZone.name = "eventZone";
+    eventZone.actionManager = new BABYLON.ActionManager(scene);
+    eventZone.actionManager.isRecursive = true;
+    eventZone.isPickable = true;
+    attachLabel(newMeshes[9], "이벤트존", -30, 0, 0);
+    clickMeshEvent(eventZone, -50, -80, 0);
+    makeDescription(eventZone, newMeshes[9], "330px", "60px", "-120px", descText[0]);
 
-    var coex = newMeshes[13];
-    coex.id = "coex";
-    coex.name = "coex";
-    coex.actionManager = new BABYLON.ActionManager(scene);
-    coex.actionManager.isRecursive = true;
-    coex.isPickable = true;
-    attachLabel(newMeshes[13], "코엑스", -30);
-    clickMeshEvent(coex, 0, -100, 0, newMeshes[13], "-10px", linkUrl[0], () => {
-      console.log(coex);
-    });
-    makeDescription(coex, newMeshes[13], "330px", "60px", "-120px", descText[0]);
+    var campingZone = newMeshes[8];
+    campingZone.id = "campingZone";
+    campingZone.name = "campingZone";
+    campingZone.actionManager = new BABYLON.ActionManager(scene);
+    campingZone.actionManager.isRecursive = true;
+    campingZone.isPickable = true;
+    attachLabel(newMeshes[8], "캠핑존", -30, 0, 0);
+    clickMeshEvent(campingZone, 20, -60, 0);
+    makeDescription(campingZone, newMeshes[8], "330px", "60px", "-120px", descText[0]);
 
-    var botanic = newMeshes[10];
-    botanic.id = "botanic";
-    botanic.name = "botanic";
-    botanic.actionManager = new BABYLON.ActionManager(scene);
-    botanic.actionManager.isRecursive = true;
-    botanic.isPickable = true;
-    attachLabel(newMeshes[10], "보타닉파크", -30);
-    clickMeshEvent(botanic, 0, -100, 0, newMeshes[10], "-10px", linkUrl[0], () => {
-      console.log(botanic);
-    });
-    makeDescription(botanic, newMeshes[10], "330px", "60px", "-120px", descText[0]);
+    var tripZone = newMeshes[7];
+    tripZone.id = "tripZone";
+    tripZone.name = "tripZone";
+    tripZone.actionManager = new BABYLON.ActionManager(scene);
+    tripZone.actionManager.isRecursive = true;
+    tripZone.isPickable = true;
+    attachLabel(newMeshes[7], "트립존", -30, 0, 0);
+    clickMeshEvent(tripZone, -160, -20, 0);
+    makeDescription(tripZone, newMeshes[7], "330px", "60px", "-120px", descText[0]);
 
-    console.log(newMeshes[7]);
-    newMeshes[7].isVisible = false;
-    newMeshes[8].isVisible = false;
-    newMeshes[9].isVisible = false;
-    newMeshes[24].isVisible = false;
-    newMeshes[28].isVisible = false;
+    var coin = newMeshes[5];
+    coin.id = "coin";
+    coin.name = "coin";
+    coin.actionManager = new BABYLON.ActionManager(scene);
+    coin.actionManager.isRecursive = true;
+    coin.isPickable = true;
+    clickCoinEvent(coin);
+
+
+    // Animations
+    var coin = newMeshes[5];
+    var alpha1 = 0;
+    scene.registerBeforeRender(function () {
+      coin.rotation = new BABYLON.Vector3(deg * 1, alpha1, 0);
+      alpha1 += 0.05;
+    });
+
+    var hotballoon = newMeshes[4];
+    hotballoon.position = new BABYLON.Vector3(-15.1, 0, 6.25);
+    var direction = true;
+    scene.registerBeforeRender(function () {
+      // Check if hotballoon is moving right
+      if (hotballoon.position.y < 10 && direction) {
+        hotballoon.position.y += 0.01;
+      } else {
+        direction = false;
+      }
+      // Check if hotballoon is moving left
+      if (hotballoon.position.y > 0.5 && !direction) {
+        hotballoon.position.y -= 0.01;
+      } else {
+        direction = true;
+      }
+    });
+
+    var land = newMeshes[15];
+    var sea = newMeshes[3];
+    land.receiveShadows = true;
+    sea.receiveShadows = true;
+
+    // Shadows
+    var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
+    for (i = 0; i < newMeshes.length; i++) {
+      shadowGenerator.getShadowMap().renderList.push(newMeshes[i]);
+    }
+    shadowGenerator.useBlurExponentialShadowMap = true;
+    shadowGenerator.useKernelBlur = true;
+    shadowGenerator.blurKernel = 64;
   });
 
-  // // load stadium
-  // BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-stadium.gltf", scene, function (newMeshes) {
-  //   var stadium = newMeshes[0];
-  //   stadium.id = "stadium";
-  //   stadium.name = "stadium";
-  //   stadium.scaling.scaleInPlace(1500);
-  //   stadium.position = new BABYLON.Vector3(120, 1, -130);
-  //   stadium.rotation = new BABYLON.Vector3(0, 0, 0);
-  //   stadium.actionManager = new BABYLON.ActionManager(scene);
-  //   stadium.actionManager.isRecursive = true;
-  //   stadium.isPickable = true;
+  var planeOpts = {
+    height: 5.4762,
+    width: 7.3967,
+    sideOrientation: BABYLON.Mesh.DOUBLESIDE
+  };
 
-  //   attachLabel(newMeshes[1], "Live Streaming", -70);
-  //   clickMeshEvent(stadium, 0, -100, 0, newMeshes[1], "-10px", linkUrl[0]);
-  //   makeDescription(stadium, newMeshes[1], "330px", "60px", "-120px", descText[0]);
-  // });
+  var vid1 = BABYLON.MeshBuilder.CreatePlane("myUniverse", planeOpts, scene);
+  vid1.position = new BABYLON.Vector3(112, 1.6, 1.6);
+  vid1.scaling = new BABYLON.Vector3(4.3, 3.3, 1);
+  vid1.rotation = new BABYLON.Vector3(0, deg * 1, 0);
+  var vid1Mat = new BABYLON.StandardMaterial("m", scene);
+  var vid1VidTex = new BABYLON.VideoTexture("concert", "./assets/video/vid1.mp4", scene);
+  vid1Mat.diffuseTexture = vid1VidTex;
+  vid1Mat.roughness = 1;
+  vid1Mat.emissiveColor = new BABYLON.Color3.White();
+  vid1.material = vid1Mat;
+  vid1VidTex.video.muted = true;
+  vid1VidTex.video.play();
+  scene.onPointerObservable.add(function (evt) {
+    if (evt.pickInfo.pickedMesh === vid1) {
+      mediaModal.style.display = "block";
+      videoCont.setAttribute("src", "./assets/video/" + mediaSrc[0]);
+    }
+  }, BABYLON.PointerEventTypes.POINTERPICK);
 
-  // // load tower
-  // BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-tower.gltf", scene, function (newMeshes) {
-  //   var tower = newMeshes[0];
-  //   tower.id = "tower";
-  //   tower.name = "tower";
-  //   tower.scaling.scaleInPlace(1500)
-  //   tower.position = new BABYLON.Vector3(55, 14, 50);
-  //   tower.rotation = new BABYLON.Vector3(0, 0, 0);
-  //   tower.actionManager = new BABYLON.ActionManager(scene);
-  //   tower.actionManager.isRecursive = true;
-  //   tower.material = new MToonMaterial('mat1', scene);
+  var vid2 = BABYLON.MeshBuilder.CreatePlane("lalaLand", planeOpts, scene);
+  vid2.position = new BABYLON.Vector3(132.6, 2, 116.5);
+  vid2.scaling = new BABYLON.Vector3(4.3, 3.3, 1);
+  vid2.rotation = new BABYLON.Vector3(0, (deg * 2) + (deg / 6), 0);
+  var vid2Mat = new BABYLON.StandardMaterial("m", scene);
+  var vid2VidTex = new BABYLON.VideoTexture("movie", "./assets/video/vid2.mp4", scene);
+  vid2Mat.diffuseTexture = vid2VidTex;
+  vid2Mat.roughness = 1;
+  vid2Mat.emissiveColor = new BABYLON.Color3.White();
+  vid2.material = vid2Mat;
+  vid2VidTex.video.muted = true;
+  vid2VidTex.video.play();
+  scene.onPointerObservable.add(function (evt) {
+    if (evt.pickInfo.pickedMesh === vid2) {
+      mediaModal.style.display = "block";
+      videoCont.setAttribute("src", "./assets/video/" + mediaSrc[1]);
+    }
+  }, BABYLON.PointerEventTypes.POINTERPICK);
 
-  //   attachLabel(newMeshes[1], "V-Commerce", 30);
-  //   clickMeshEvent(tower, 0, -100, 60, newMeshes[1], "-55px", linkUrl[1]);
-  //   makeDescription(tower, newMeshes[1], "330px", "60px", "-120px", descText[1]);
-  // });
+  videoClose.addEventListener("click", function () {
+    mediaModal.style.display = "none";
+    videoCont.setAttribute("src", "");
+  })
 
-  // // load palace
-  // BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-gung.gltf", scene, function (newMeshes) {
-  //   BABYLON.Mesh.FRONTSIDE;
-  //   var palace = newMeshes[0];
-  //   palace.id = "palace";
-  //   palace.name = "palace";
-  //   palace.scaling.scaleInPlace(1200);
-  //   palace.position = new BABYLON.Vector3(0, -10, 0);
-  //   palace.rotation = new BABYLON.Vector3(0, 0, 0);
-  //   palace.actionManager = new BABYLON.ActionManager(scene);
-  //   palace.actionManager.isRecursive = true;
-
-  //   attachLabel(newMeshes[1], "Promotion Room", -60);
-  //   clickMeshEvent(palace, 0, -100, 0, newMeshes[1], "50px", linkUrl[2]);
-  //   makeDescription(palace, newMeshes[1], "330px", "60px", "-120px", descText[2]);
-  // });
-
-  // // load billboard
-  // BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "hansol-pan.gltf", scene, function (newMeshes) {
-  //   var billboard = newMeshes[0];
-  //   billboard.id = "billboard";
-  //   billboard.name = "billboard";
-  //   billboard.scaling.scaleInPlace(1200);
-  //   billboard.position = new BABYLON.Vector3(120, 0, 145);
-  //   billboard.rotation = new BABYLON.Vector3(0, 0, 0);
-
-  //   attachLabel(newMeshes[1], "Billboard", -120);
-  //   billboard.actionManager = new BABYLON.ActionManager(scene);
-  //   billboard.actionManager.isRecursive = true;
-
-  //   makeDescription(billboard, newMeshes[1], "330px", "60px", "-120px", descText[3]);
-  // });
-
-
-
-  // // load ufo
-  //   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "ufo.gltf", scene, function (newMeshes) {
-  //     var ufo = newMeshes[0];
-  //     ufo.id = "ufo";
-  //     ufo.name = "ufo";
-  //     ufo.scaling.scaleInPlace(0.015);
-
-  //     scene.actionManager = new BABYLON.ActionManager(scene);
-
-  //     // Animations
-  //     var alpha = 0;
-  //     var alpha2 = 0;
-  //     scene.registerBeforeRender(function () {
-  //       ufo.position.x = 250 * Math.cos(alpha);
-  //       ufo.position.y = 65;
-  //       ufo.position.z = 250 * Math.sin(alpha);
-  //       ufo.rotation = new BABYLON.Vector3(0,alpha2,0);
-
-  //       alpha += 0.005;
-  //       alpha2 += 0.03;
-
-  //     });
-  //   });
-
-  // load bird
-  //   BABYLON.SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/crsmymin/babylonjs/master/", "bird2.gltf", scene, function (newMeshes) {
-  //     var bird = newMeshes[0];
-  //     bird.id = "bird";
-  //     bird.name = "bird";
-  //     bird.scaling.scaleInPlace(1);
-  //     bird.actionManager = new BABYLON.ActionManager(scene); 
-  //     scene.actionManager = new BABYLON.ActionManager(scene);
-
-  //     // Animations
-  //     var alpha = 0;
-  //     var alpha2 = deg*2;
-
-
-  //     scene.registerBeforeRender(function () {    
-  //         bird.position.x += 0.5;
-
-  //         bird.position.x = 300 * Math.cos(alpha);
-  //         bird.position.y = 45;
-  //         bird.position.z = 300 * Math.sin(alpha);
-  //         bird.rotation = new BABYLON.Vector3(0,alpha2,0);
-
-  //         alpha += 0.002;
-  //         alpha2 -= 0.002;
-  //     });
-
-  //     bird.actionManager.isRecursive = true;
-  //     makeDescription(bird,newMeshes[1],"200px","40px","-50px",descText[4]);
-  //   });
-
-  // var planeOpts = {
-  //   height: 5.4762,
-  //   width: 7.3967,
-  //   sideOrientation: BABYLON.Mesh.DOUBLESIDE
-  // };
-  // var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
-  // var vidPos = (new BABYLON.Vector3(120, 20, 142))
-  // ANote0Video.position = vidPos;
-  // ANote0Video.scaling = new BABYLON.Vector3(9, 6.8, 1);
-  // ANote0Video.rotation = new BABYLON.Vector3(0, 0, 0);
-  // var ANote0VideoMat = new BABYLON.StandardMaterial("m", scene);
-  // var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex", "textures/babylonjs.mp4", scene);
-  // ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
-  // ANote0VideoMat.roughness = 1;
-  // ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
-  // ANote0Video.material = ANote0VideoMat;
-  // ANote0VideoVidTex.video.muted = true;
-  // ANote0VideoVidTex.video.play();
-  // scene.onPointerObservable.add(function (evt) {
-  //   if (evt.pickInfo.pickedMesh === ANote0Video) {
-  //     //console.log("picked");            
-  //     if (ANote0VideoVidTex.video.paused) {
-  //       ANote0VideoVidTex.video.play();
-  //       alert("play video");
-  //     } else {
-  //       alert("paused video");
-  //       ANote0VideoVidTex.video.pause();
-  //       console.log(ANote0VideoVidTex.video.paused ? "paused" : "playing");
-  //     }
-  //   }
-  // }, BABYLON.PointerEventTypes.POINTERPICK);
   return scene;
 }
 

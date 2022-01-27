@@ -17,6 +17,7 @@
     <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
     <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
     <script src="https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -24,34 +25,31 @@
     <!-- Start: loading screen -->
     <div id="loadingScreen">
         <div id="textArea">
-            <h1 id="screenTitle">
-                meta forming
-            </h1>
-            <span id="status">
-                Loading ...
-            </span>
-            <button id="btnEnter">
-                Enter
-            </button>
+            <h2 id="serviceTitle">
+                <img src="./assets/img/service-title.png" alt="">
+            </h2>
         </div>
         <div id="loadingBar">
             <div id="gauge"></div>
+            <span id="status">
+                월드 접속 중 입니다. 잠시만 기다려주세요.
+            </span>
+            <button id="btnEnter">
+                접속하기
+            </button>
         </div>
     </div>
     <!-- End: loading screen -->
 
+    <!-- Start: dim layer -->
+    <div id="dimLayer"></div>
+    <!-- End: dim layer -->
+
     <!-- Start: contents modal -->
     <div id="contentModal">
         <a href="javascript:void(0)" id="closeContentModal">
-            <img src="./assets/img/close.png" alt="">
+            <img src="" alt="">
         </a>
-        <div id="contentWrap">
-            <h3></h3>
-            <a target="_blank" href="" id="link">
-                <img src="./assets/img/enterance.png" alt="">
-            </a>
-            <p class="desc"></p>
-        </div>
     </div>
     <!-- End: contents modal -->
 
@@ -59,10 +57,39 @@
     <div id="mediaModal">
         <a href="javascript:void(0)" id="closeMediaModal"></a>
         <div id="mediaWrap">
-            
+            <a href="javascript:void(0)" id="mediaClose">
+                <img src="./assets/img/close.png" alt="">
+            </a>
+            <video src="" controls></video>
         </div>
     </div>
     <!-- End: media modal -->
+
+    <!-- Start: Ui -->
+    <span id="gameMoney">
+        <img src="./assets/img/money.png" alt="">
+    </span>
+    <div id="penguinSwap">
+        <!-- <a href="javascript:void(0)" id="closeSwapScreen">
+            <img src="./assets/img/close.png" alt="">
+        </a> -->
+        <div class="swiper mySwiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <img src="./assets/img/slide1.png" alt="">
+            </div>
+            <div class="swiper-slide">
+                <img src="./assets/img/slide2.png" alt="">
+            </div>
+            <div class="swiper-slide">
+                <img src="./assets/img/slide3.png" alt="">
+            </div>
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+    <!-- End: Ui -->
 
     <!-- Start: canvas -->
     <canvas id="renderCanvas"></canvas>
@@ -70,6 +97,8 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="./index.js"></script>
 </body>
 
