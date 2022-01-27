@@ -22,10 +22,10 @@ if (document.readyState === "complete") {
       });
       document.getElementById("status").style.display = "none";
       document.getElementById("btnEnter").style.display = "block";
-    }, 2000)
-    // setTimeout(function () {
-    //   loadingScreenDiv.classList.add("disapear");
-    // }, 15000);
+    }, 8000)
+    setTimeout(function () {
+      loadingScreenDiv.classList.add("disapear");
+    }, 15000);
 
     var swiper = new Swiper(".mySwiper", {
       navigation: {
@@ -67,7 +67,7 @@ var createScene = function () {
   var camera = new BABYLON.ArcRotateCamera("main camera", 1.6, 1.13, 12.5, new BABYLON.Vector3(0, 0, 0), scene);
   scene.activeCamera = camera;
   scene.activeCamera.attachControl(canvas, true);
-  scene.debugLayer.show();
+  // scene.debugLayer.show();
   // define degree
   var deg = Math.PI / 2;
   var deg1 = deg / 90;
@@ -95,7 +95,7 @@ var createScene = function () {
   light.intensity = 1.5;
 
   var light2 = new BABYLON.HemisphericLight("hemislight", new BABYLON.Vector3(0, 1, 0), scene);
-  light2.intensity = 0.8;
+  light2.intensity = 1.3;
   light2.specular = BABYLON.Color3.Black();
 
   var text = "오늘의 공연";
@@ -216,6 +216,7 @@ var createScene = function () {
     descWrap.linkWithMesh(target);
     descWrap.linkOffsetX = 0;
     descWrap.linkOffsetY = offsetY;
+    descWrap.dispose();
 
     let desc = new BABYLON.GUI.TextBlock();
     desc.text = descriptions;
@@ -228,6 +229,7 @@ var createScene = function () {
     desc.paddingLeft = "10px";
     desc.paddingRight = "10px";
     descWrap.addControl(desc);
+    desc.dispose();
 
     targetMesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function (ev) {
       document.body.style.cursor = 'pointer';
@@ -346,6 +348,64 @@ var createScene = function () {
     camera.attachControl();
   })
 
+  BABYLON.SceneLoader.ImportMesh("", "./assets/model/", "island.glb", scene, function (newMeshes) {
+    console.log(newMeshes);
+    var ground = newMeshes[0];
+    var sea = newMeshes[1];
+    var island1 = newMeshes[2];
+    var island2 = newMeshes[3];
+    var island3 = newMeshes[4];
+    var island4 = newMeshes[5];
+    var island5 = newMeshes[6];
+    var ship = newMeshes[7];
+    ground.isVisible = false;
+    sea.isVisible = false;
+    island1.id = "island1";
+    island1.name = "island1";
+    island2.id = "island2";
+    island2.name = "island2";
+    island3.id = "island3";
+    island3.name = "island3";
+    island4.id = "island4";
+    island4.name = "island4";
+    island5.id = "island5";
+    island5.name = "island5";
+    ship.name = "ship";
+    ship.id = "ship";
+    island1.scaling = new BABYLON.Vector3(5, 5, 5);
+    island1.position = new BABYLON.Vector3(350, -20, 0);
+    island1.rotation = new BABYLON.Vector3(deg1 * 260, 0, 0);
+    island2.scaling = new BABYLON.Vector3(5, 5, 5);
+    island2.position = new BABYLON.Vector3(-300, -20, -150);
+    island2.rotation = new BABYLON.Vector3(deg1 * 260, 0, 0);
+    island3.scaling = new BABYLON.Vector3(5, 5, 5);
+    island3.position = new BABYLON.Vector3(-200, -20, 250);
+    island3.rotation = new BABYLON.Vector3(deg1 * 260, 0, 0);
+    island4.scaling = new BABYLON.Vector3(5, 5, 5);
+    island4.position = new BABYLON.Vector3(0, -20, -300);
+    island4.rotation = new BABYLON.Vector3(deg1 * 260, 0, 0);
+    island5.scaling = new BABYLON.Vector3(6, 6, 6);
+    island5.position = new BABYLON.Vector3(150, -20, 300);
+    island5.rotation = new BABYLON.Vector3(deg1 * 260, 0, 0);
+    
+    //   load ship
+    ship.scaling.scaleInPlace(0.08);
+    ship.actionManager = new BABYLON.ActionManager(scene);
+    scene.actionManager = new BABYLON.ActionManager(scene);
+    // Animations
+    var alpha = 0;
+    var alpha2 = deg * 2;
+    scene.registerBeforeRender(function () {
+      ship.position.x += 0.5;
+      ship.position.x = 240 * Math.cos(alpha);
+      ship.position.y = -20;
+      ship.position.z = 240 * Math.sin(alpha);
+      ship.rotation = new BABYLON.Vector3(0, deg1 * 95 + alpha2, 0);
+      alpha += 0.0009;
+      alpha2 -= 0.00085;
+    });
+  })
+
   // load mesh
   BABYLON.SceneLoader.ImportMesh("", "./assets/model/", "metakong_map3.glb", scene, function (newMeshes) {
     console.log(newMeshes);
@@ -372,7 +432,7 @@ var createScene = function () {
     commercial.actionManager = new BABYLON.ActionManager(scene);
     commercial.actionManager.isRecursive = true;
     commercial.isPickable = true;
-    attachLabel(newMeshes[2], "커머셜존", -120, -30, 0);
+    attachLabel(newMeshes[2], "상점가", -120, -30, 0);
     clickMeshEvent(commercial, -50, 120, 0);
     makeDescription(commercial, newMeshes[2], "330px", "60px", "-120px", descText[0]);
 
@@ -382,7 +442,7 @@ var createScene = function () {
     eventZone.actionManager = new BABYLON.ActionManager(scene);
     eventZone.actionManager.isRecursive = true;
     eventZone.isPickable = true;
-    attachLabel(newMeshes[9], "이벤트존", -30, 0, 0);
+    attachLabel(newMeshes[9], "이글루스왑", -30, 0, 0);
     clickMeshEvent(eventZone, -50, -80, 0);
     makeDescription(eventZone, newMeshes[9], "330px", "60px", "-120px", descText[0]);
 
@@ -392,7 +452,7 @@ var createScene = function () {
     campingZone.actionManager = new BABYLON.ActionManager(scene);
     campingZone.actionManager.isRecursive = true;
     campingZone.isPickable = true;
-    attachLabel(newMeshes[8], "캠핑존", -30, 0, 0);
+    attachLabel(newMeshes[8], "캠핑장", -30, 0, 0);
     clickMeshEvent(campingZone, 20, -60, 0);
     makeDescription(campingZone, newMeshes[8], "330px", "60px", "-120px", descText[0]);
 
@@ -402,7 +462,7 @@ var createScene = function () {
     tripZone.actionManager = new BABYLON.ActionManager(scene);
     tripZone.actionManager.isRecursive = true;
     tripZone.isPickable = true;
-    attachLabel(newMeshes[7], "트립존", -30, 0, 0);
+    attachLabel(newMeshes[7], "열기구승강장", -30, 0, 0);
     clickMeshEvent(tripZone, -160, -20, 0);
     makeDescription(tripZone, newMeshes[7], "330px", "60px", "-120px", descText[0]);
 
@@ -414,6 +474,31 @@ var createScene = function () {
     coin.isPickable = true;
     clickCoinEvent(coin);
 
+    var cloud = newMeshes[13];
+    cloud.id = "cloud";
+    cloud.name = "cloud";
+
+    var cloud2 = cloud.clone("cloud2");
+    
+    cloud2.position = new BABYLON.Vector3(0,7,10);
+    cloud2.scaling.scaleInPlace(0.5);
+    cloud2.rotation = new BABYLON.Vector3(deg*1,deg1*90,0)
+
+    var direction2 = true;
+    scene.registerBeforeRender(function () {
+      // Check if cloud2 is moving right
+      if (cloud2.position.x < 5 && direction2) {
+        cloud2.position.x += 0.01;
+      } else {
+        direction2 = false;
+      }
+      // Check if cloud2 is moving left
+      if (cloud2.position.x > 0.5 && !direction2) {
+        cloud2.position.x -= 0.01;
+      } else {
+        direction2 = true;
+      }
+    });
 
     // Animations
     var coin = newMeshes[5];
@@ -429,13 +514,13 @@ var createScene = function () {
     scene.registerBeforeRender(function () {
       // Check if hotballoon is moving right
       if (hotballoon.position.y < 10 && direction) {
-        hotballoon.position.y += 0.01;
+        hotballoon.position.y += 0.02;
       } else {
         direction = false;
       }
       // Check if hotballoon is moving left
       if (hotballoon.position.y > 0.5 && !direction) {
-        hotballoon.position.y -= 0.01;
+        hotballoon.position.y -= 0.02;
       } else {
         direction = true;
       }
@@ -444,7 +529,7 @@ var createScene = function () {
     var land = newMeshes[15];
     var sea = newMeshes[3];
     land.receiveShadows = true;
-    sea.receiveShadows = true;
+    // sea.receiveShadows = true;
 
     // Shadows
     var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);

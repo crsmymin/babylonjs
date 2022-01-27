@@ -21,7 +21,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url(./assets/img/loading.jpg);
+  background-image: url(./assets/img/loading.png);
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -40,13 +40,13 @@ body {
   left: 0;
   width: 100%;
   height: 7%;
-  background-color: rgba(16, 30, 6, 0.6);
+  background-color: #213e7562;
 }
 
 #gauge {
   width: 45%;
   height: 100%;
-  background-color: rgba(16, 30, 6, 1);
+  background-color: #213f75;
 }
 
 #textArea {
