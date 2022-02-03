@@ -40,13 +40,13 @@ body {
   left: 0;
   width: 100%;
   height: 7%;
-  background-color: #213e7562;
+  background-color: #213e752f;
 }
 
 #gauge {
   width: 45%;
   height: 100%;
-  background-color: #213f75;
+  background-color: #213e75d8;
 }
 
 #textArea {
