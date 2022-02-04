@@ -44,9 +44,28 @@ body {
 }
 
 #gauge {
-  width: 45%;
+  width: 10%;
   height: 100%;
   background-color: #213e75d8;
+  transition: all 4s ease-in;
+  -webkit-transition: all 4s ease-in;
+  -moz-transition: all 4s ease-in;
+  -ms-transition: all 4s ease-in;
+  -o-transition: all 4s ease-in;
+}
+
+
+#gauge.inter {
+  width: 65%;
+}
+
+#gauge.done {
+  width: 100%;
+  transition: all .2s ease-in-out;
+  -webkit-transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  -ms-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
 }
 
 #textArea {
@@ -193,15 +212,39 @@ video {
 #dimLayer.show {
   display: block;
 }
+#serviceInfo {
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+#serviceInfo img {
+  width: 200px;
+}
+#serviceInfoContainer {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 70%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  z-index: 992;
+}
+#serviceInfoContainer.show {
+  display: block;
+}
 #gameMoney {
   position: absolute;
   top: 10px;
   right: 10px;
 }
 #gameMoney img {
-  width: 160px;
+  width: 240px;
 }
-
 #penguinSwap {
   display: none;
   position: fixed;
@@ -252,19 +295,36 @@ video {
   object-fit: cover;
 }
 
-.swiper-button-next,
-.swiper-button-prev {
+#penguinSwap .swiper-button-next,
+#penguinSwap .swiper-button-prev {
   width: 40px;
   height: 40px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: 30px;
 }
-.swiper-button-next {
+#penguinSwap .swiper-button-next {
   background-image: url(./assets/img/arr-right.png);
 }
-.swiper-button-prev {
+#penguinSwap .swiper-button-prev {
   background-image: url(./assets/img/arr-left.png);
+}
+
+#serviceInfoContainer .swiper-button-next,
+#serviceInfoContainer .swiper-button-prev {
+  width: 40px;
+  height: 40px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 30px;
+}
+
+#serviceInfoContainer .swiper-button-next {
+  background-image: url(./assets/img/arr-right-o.png);
+}
+
+#serviceInfoContainer .swiper-button-prev {
+  background-image: url(./assets/img/arr-left-o.png);
 }
 
 .swiper-button-next:after,

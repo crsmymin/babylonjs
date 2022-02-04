@@ -1,46 +1,44 @@
 var loadingScreenDiv = window.document.getElementById("loadingScreen");
 var btnEnter = document.getElementById("btnEnter");
-
-if (document.readyState === "complete") {
-  // Fully loaded!
-
-} else if (document.readyState === "interactive") {
+// Loading still in progress.
+// To wait for it to complete, add "DOMContentLoaded" or "load" listeners.
+window.addEventListener("DOMContentLoaded", () => {
   // DOM ready! Images, frames, and other subresources are still downloading.
+  document.getElementById("gauge").classList.add("inter");
+});
 
-} else {
-  // Loading still in progress.
-  // To wait for it to complete, add "DOMContentLoaded" or "load" listeners.
-  window.addEventListener("DOMContentLoaded", () => {
-    // DOM ready! Images, frames, and other subresources are still downloading.
+window.addEventListener("load", () => {
+  // Fully loaded!
+  setTimeout(function () {
+    document.getElementById("gauge").classList.add("done");
+    document.getElementById("status").style.display = "none";
+    document.getElementById("btnEnter").style.display = "block";
+  }, 8000)
+  setTimeout(function () {
+    loadingScreenDiv.classList.add("disapear");
+  }, 15000);
+
+  var swiper = new Swiper(".mySwiper", {
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
   });
+});
 
-  window.addEventListener("load", () => {
-    // Fully loaded!
-    setTimeout(function () {
-      requestAnimationFrame(function () {
-        document.getElementById("gauge").style.width = "100%";
-      });
-      document.getElementById("status").style.display = "none";
-      document.getElementById("btnEnter").style.display = "block";
-    }, 8000)
-    setTimeout(function () {
-      loadingScreenDiv.classList.add("disapear");
-    }, 15000);
-
-    var swiper = new Swiper(".mySwiper", {
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-    });
-  });
-}
 
 btnEnter.addEventListener("click", () => {
   loadingScreenDiv.classList.add("disapear");
 })
 
+var btnServiceInfo = document.getElementById("serviceInfo");
+var serviceInfoCont = document.getElementById("serviceInfoContainer");
 var canvas = document.getElementById("renderCanvas");
+
+btnServiceInfo.addEventListener("click", function () {
+  dimLayer.classList.add("show");
+  serviceInfoCont.classList.add("show");
+});
 
 var engine = null;
 var scene = null;
@@ -345,6 +343,7 @@ var createScene = function () {
   dimLayer.addEventListener("click", function () {
     this.classList.remove("show");
     penguinSwap.classList.remove("show");
+    serviceInfoCont.classList.remove("show");
     camera.attachControl();
   })
 
@@ -387,7 +386,7 @@ var createScene = function () {
     island5.scaling = new BABYLON.Vector3(6, 6, 6);
     island5.position = new BABYLON.Vector3(150, -20, 300);
     island5.rotation = new BABYLON.Vector3(deg1 * 260, 0, 0);
-    
+
     //   load ship
     ship.scaling.scaleInPlace(0.08);
     ship.actionManager = new BABYLON.ActionManager(scene);
@@ -479,10 +478,10 @@ var createScene = function () {
     cloud.name = "cloud";
 
     var cloud2 = cloud.clone("cloud2");
-    
-    cloud2.position = new BABYLON.Vector3(0,7,10);
+
+    cloud2.position = new BABYLON.Vector3(0, 7, 10);
     cloud2.scaling.scaleInPlace(0.5);
-    cloud2.rotation = new BABYLON.Vector3(deg*1,deg1*90,0)
+    cloud2.rotation = new BABYLON.Vector3(deg * 1, deg1 * 90, 0)
 
     var direction2 = true;
     scene.registerBeforeRender(function () {
