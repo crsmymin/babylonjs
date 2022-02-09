@@ -60,12 +60,22 @@ var createScene = function () {
     }
   });
 
+  var inputMap = {}; // 키보드 이벤트 
+  // 아바타 초기 위치
+  var player_position = {
+      position: new BABYLON.Vector3(3, 0.077, -2), // 위치
+      y: 0.077, // 아바타-캠 기본 높이
+      alpha: Math.PI, // 시각
+      speed: 0.03 // 속도
+  }
+
   // Scene and Camera
   var scene = new BABYLON.Scene(engine);
   var camera = new BABYLON.ArcRotateCamera("main camera", 1.6, 1.13, 12.5, new BABYLON.Vector3(0, 0, 0), scene);
   scene.activeCamera = camera;
   scene.activeCamera.attachControl(canvas, true);
   // scene.debugLayer.show();
+  
   // define degree
   var deg = Math.PI / 2;
   var deg1 = deg / 90;
@@ -73,11 +83,11 @@ var createScene = function () {
   // camera
   camera.minZ = 1;
   camera.maxZ = 30000;
-  camera.lowerBetaLimit = 0.9;
-  camera.upperBetaLimit = 1.3;
+  // camera.lowerBetaLimit = 0.9;
+  // camera.upperBetaLimit = 1.3;
   camera.angularSensibilityX = 5000;
-  camera.lowerRadiusLimit = 150;
-  camera.upperRadiusLimit = 410;
+  // camera.lowerRadiusLimit = 150;
+  // camera.upperRadiusLimit = 810;
   camera.panningDistanceLimit = 1;
   camera.wheelPrecision = 1;
   camera.pinchPrecision = 0.5;
@@ -170,11 +180,10 @@ var createScene = function () {
     // GUI
     var rect1 = new BABYLON.GUI.Rectangle();
     rect1.parent = modelName;
-    rect1.width = "100px";
-    rect1.height = "25px";
+    rect1.width = "135px";
+    rect1.height = "32px";
     rect1.thickness = 0;
-    rect1.background = "black";
-    rect1.alpha = 0.6;
+    rect1.background = "white";
     rect1.cornerRadius = 25;
     advancedTexture.addControl(rect1);
     rect1.linkWithMesh(modelName);
@@ -184,9 +193,10 @@ var createScene = function () {
 
     var label = new BABYLON.GUI.TextBlock();
     label.text = modelText;
-    label.color = "white";
-    label.fontSize = "14px";
+    label.color = "black";
+    label.fontSize = "18x";
     rect1.addControl(label);
+    rect1.dispose();
   }
 
   // rotate camera animation
@@ -199,7 +209,6 @@ var createScene = function () {
 
   // function hover mesh event
   function makeDescription(targetMesh, target, rectWidth, rectHeight, offsetY, descriptions) {
-
     // description for model
     let descWrap = new BABYLON.GUI.Rectangle();
     advancedTexture.addControl(descWrap);
@@ -332,9 +341,9 @@ var createScene = function () {
     contentModal.classList.remove("open");
     mediaModal.style.display = "none"
     videoCont.setAttribute("src", "");
-    moveTo(camera, new BABYLON.Vector3(0, 0, 0), 0.055, 0.648, 410, () => {
-      camera.lowerRadiusLimit = 150;
-      camera.upperRadiusLimit = 410;
+    moveTo(camera, new BABYLON.Vector3(0, 0, 0), 0.055, 0.648, 810, () => {
+      // camera.lowerRadiusLimit = 150;
+      // camera.upperRadiusLimit = 710;
       camera.attachControl();
     })
   })
@@ -400,8 +409,8 @@ var createScene = function () {
       ship.position.y = -20;
       ship.position.z = 240 * Math.sin(alpha);
       ship.rotation = new BABYLON.Vector3(0, deg1 * 95 + alpha2, 0);
-      alpha += 0.0009;
-      alpha2 -= 0.00085;
+      alpha += 0.00088;
+      alpha2 -= 0.000875;
     });
   })
 
